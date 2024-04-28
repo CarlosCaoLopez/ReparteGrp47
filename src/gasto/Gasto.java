@@ -79,7 +79,9 @@ public class Gasto implements IGasto {
 		
 		return this;
 	}
-
+	
+	
+	
 	// equals de gastos (es literalmente el de usuario ya que ambos usan id)
 		@Override 
 		public boolean equals(Object obj) {
