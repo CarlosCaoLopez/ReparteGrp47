@@ -114,7 +114,7 @@ public class Usuario implements IUsuario {
 	}
 
 
-	public ArrayList<IGrupo> getGastos() {
+	public ArrayList<IGasto> getGastos() {
 		return gastos;
 	}
 

@@ -10,7 +10,7 @@ public interface IGasto {
 //	private IGrupo grupoGasto;
 //	private IUsuario pagador;
 	
-	public void asignarGrupo(IGasto gasto);
+	//public void asignarGrupo(IGasto gasto);
 	public void modificarGasto(double nuevacantidad);
 	public void modificarServicio(String nuevoservicio);
 	public void modificarPagador(IUsuario nuevopagador);
