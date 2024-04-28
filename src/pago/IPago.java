@@ -1,6 +1,8 @@
 package pago;
 
+import java.util.ArrayList;
 import grupo.IGrupo;
+import usuario.IUsuario;
 
 public interface IPago {
 	
@@ -11,5 +13,6 @@ public interface IPago {
 //	private ArrayList<IUsuario> deudores;
 	
 	public void asignarGrupo(IGrupo grupo);
-
+	public void asignarDeudores(ArrayList<IUsuario> nuevosdeudores);
+	
 }
