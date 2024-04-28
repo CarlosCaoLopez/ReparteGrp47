@@ -1,3 +1,4 @@
+// Hola
 package ficheros;
 
 public class MiFile {
