@@ -2,6 +2,7 @@ package usuario;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.time.LocalDate;
 
 import gasto.Gasto;
 import gasto.IGasto;
@@ -15,7 +16,7 @@ public class Usuario implements IUsuario {
 	private String nombreUsuario;
 	private String nombreReal;
 	private String correoElectronico;
-	private String fechaNacimiento;
+	private LocalDate fechaNacimiento;
 	private String contrasena;
 	private String datosBancarios;
 	private ArrayList<String> notificaciones; 
@@ -26,41 +27,103 @@ public class Usuario implements IUsuario {
 	
 	// Constructores
 	
-	public Usuario(int id, String nombreUsuario, String nombreReal, String correoElectronico, String fechaNacimiento, String contrasena, String datosBancarios,
-			ArrayList<String> notificaciones, ArrayList<IGrupo> grupos, ArrayList<IGrupo> gastos,  ArrayList<IPago> pagos) {
+	public Usuario(int id, String nombreUsuario, String nombreReal, String correoElectronico, LocalDate fechaNacimiento, String contrasena, String datosBancarios,
+			ArrayList<String> notificaciones, ArrayList<IGrupo> arrayList, ArrayList<IGrupo> arrayList2,  ArrayList<IGasto> arrayList3) {
 		if(id > 0 && nombreUsuario != null && correoElectronico != null && fechaNacimiento != null && contrasena != null && datosBancarios != null
-				&& notificaciones != null && grupos != null && gastos != null && pagos != null) {
-			this.id = id;
-			this.nombreUsuario = nombreUsuario;
-			this.correoElectronico = correoElectronico;
-			this.fechaNacimiento = fechaNacimiento;
-			this.contrasena = contrasena;
-			this.datosBancarios = datosBancarios;
-			this.notificaciones = new ArrayList<>();
-			this.grupos = new ArrayList<>();
-			this.grupos.addAll(grupos);
-			this.gastos = new ArrayList<>();
-			this.gastos.addAll(gastos);
-			this.pagos = new ArrayList<>();
-			this.pagos.addAll(pagos);
+				&& notificaciones != null && arrayList != null && arrayList2 != null && arrayList3 != null) {
+			if(checkCorreoElectronico(correoElectronico) && checkDatosBancarios(datosBancarios) && checkContrasena(contrasena)) {
+				this.id = id;
+				this.nombreUsuario = nombreUsuario;
+				this.correoElectronico = correoElectronico;
+				this.fechaNacimiento = fechaNacimiento;
+				this.contrasena = contrasena;
+				this.datosBancarios = datosBancarios;
+				this.notificaciones = new ArrayList<>();
+				this.grupos = new ArrayList<>();
+				this.grupos.addAll(arrayList);
+				this.gastos = new ArrayList<>();
+				this.gastos.addAll(arrayList2);
+				this.pagos = new ArrayList<>();
+				this.pagos.addAll(arrayList3);
+			}
 		}
 	}
 	
 	
-	public Usuario(int id, String nombreUsuario, String nombreReal, String correoElectronico, String fechaNacimiento, String contrasena, String datosBancarios) {
+	public Usuario(int id, String nombreUsuario, String nombreReal, String correoElectronico, LocalDate fechaNacimiento, String contrasena, String datosBancarios) {
 		if(nombreUsuario != null && correoElectronico != null && fechaNacimiento != null && contrasena != null && datosBancarios != null) {
-			this.id = id;
-			this.nombreUsuario = nombreUsuario;
-			this.correoElectronico = correoElectronico;
-			this.fechaNacimiento = fechaNacimiento;
-			this.contrasena = contrasena;
-			this.datosBancarios = datosBancarios;
-			this.notificaciones = new ArrayList<>();
-			this.grupos = new ArrayList<>();
-			this.gastos = new ArrayList<>();
-			this.pagos = new ArrayList<>();
+			if(checkCorreoElectronico(correoElectronico) && checkDatosBancarios(datosBancarios) && checkContrasena(contrasena)) {
+				this.id = id;
+				this.nombreUsuario = nombreUsuario;
+				this.correoElectronico = correoElectronico;
+				this.fechaNacimiento = fechaNacimiento;
+				this.contrasena = contrasena;
+				this.datosBancarios = datosBancarios;
+				this.notificaciones = new ArrayList<>();
+				this.grupos = new ArrayList<>();
+				this.gastos = new ArrayList<>();
+				this.pagos = new ArrayList<>();
+			}
 		}
 	}
+	
+	
+	// Getters
+	public int getId() {
+		return id;
+	}
+
+
+	public String getNombreUsuario() {
+		return nombreUsuario;
+	}
+
+
+	public String getNombreReal() {
+		return nombreReal;
+	}
+
+
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
+
+
+	public LocalDate getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+
+
+	public String getContrasena() {
+		return contrasena;
+	}
+
+
+	public String getDatosBancarios() {
+		return datosBancarios;
+	}
+
+
+	public ArrayList<String> getNotificaciones() {
+		return notificaciones;
+	}
+
+
+	public ArrayList<IGrupo> getGrupos() {
+		return grupos;
+	}
+
+
+	public ArrayList<IGrupo> getGastos() {
+		return gastos;
+	}
+
+
+	public ArrayList<IPago> getPagos() {
+		return pagos;
+	}
+
+
 
 
 	// Métodos 
@@ -77,6 +140,7 @@ public class Usuario implements IUsuario {
 		
 
 	}
+
 
 	@Override
 	public void gestionarGrupo(IGrupo grupo, String descripcion, ArrayList<IUsuario> nuevosUsuarios) {
@@ -136,6 +200,68 @@ public class Usuario implements IUsuario {
 			return false;
 		Usuario other = (Usuario) obj;
 		return id == other.id;
+	}
+	
+	
+	/**
+	 * Verifica si el correo electrónico dado es correcto. Para ser correcto debe seguir el formato:
+	 * {}@{}.{}, donde {} indican cadenas de caracteres no vacías. Y solo puede haber un @ en la cadena
+	 * 
+	 * @param correoElectronico
+	 * @return true si es correcto, false en caso contrario
+	 */
+	private boolean checkCorreoElectronico(String correoElectronico) {
+		// Restricciones: el correo electrónico
+		if(!correoElectronico.isEmpty() && !correoElectronico.startsWith("@") && correoElectronico.contains("@") && (correoElectronico.chars().filter(c -> c == '@').count() == 1) 
+			&& correoElectronico.contains(".") && !correoElectronico.endsWith(".") && (correoElectronico.lastIndexOf("@")+1<correoElectronico.lastIndexOf(".")))
+			return true;
+		
+		return false;
+	}
+	
+	/**
+	 * Verifica si el código IBAN dado es correcto. Para ser correcto debe seguir el formato:
+	 * LLNNNNNNNNNNNNNNNNNNNNNN, es decir, 2 letras (L) y 22 números (N)
+	 * En realidad, habría que realizar más comprobaciones, pero son complejas ya que dependen del país de origen de la cuenta 
+	 * (indicado con las dos primeras letras) y de otros parámetros
+	 * 
+	 * @param datosBancarios
+	 * @return true si es correcto, false en caso contrario
+	 */
+	private boolean checkDatosBancarios(String datosBancarios) {
+		if(datosBancarios.length()!=24) return false;
+		
+		// Los dos primeros caracteres del String son números y los otros 22 números
+		String verificacion = "^[a-zA-Z]{2}\\d{22}$";
+		if(datosBancarios.matches(verificacion))
+			return true;
+		
+		return false;
+	}
+	
+	/**
+	 * Verifica si la contraseña dada es correcta. Para ser correcta debe tener al menos 6 caracteres, e incluir al menos una mayúscula y un símbolo
+	 * 
+	 * @param correoElectronico
+	 * @return true si es correcto, false en caso contrario
+	 */
+	private boolean checkContrasena(String contrasena) {
+		if(contrasena.length()<6) 
+			return false;
+		
+		int checks[]= {0, 0};
+		// Comprobamos que contenga una mayúscula y un símbolo
+		for(char c : contrasena.toCharArray()) {
+			if(Character.isUpperCase(c))
+				checks[0]=1;
+			if (!Character.isLetterOrDigit(c))
+				checks[1]=1;
+		}
+		
+		if(checks[0] == 1 && checks[1] == 1) 
+			return true;
+		
+		return false;
 	}
 	
 	
