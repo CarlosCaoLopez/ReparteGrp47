@@ -21,16 +21,16 @@ public class Usuario implements IUsuario {
 	private String datosBancarios;
 	private ArrayList<String> notificaciones; 
 	private ArrayList<IGrupo> grupos;
-	private ArrayList<IGrupo> gastos;
+	private ArrayList<IGasto> gastos;
 	private ArrayList<IPago> pagos;
 	
 	
 	// Constructores
 	
 	public Usuario(int id, String nombreUsuario, String nombreReal, String correoElectronico, LocalDate fechaNacimiento, String contrasena, String datosBancarios,
-			ArrayList<String> notificaciones, ArrayList<IGrupo> arrayList, ArrayList<IGrupo> arrayList2,  ArrayList<IGasto> arrayList3) {
+			ArrayList<String> notificaciones, ArrayList<IGrupo> grupos, ArrayList<IGasto> gastos,  ArrayList<IPago> pagos) {
 		if(id > 0 && nombreUsuario != null && correoElectronico != null && fechaNacimiento != null && contrasena != null && datosBancarios != null
-				&& notificaciones != null && arrayList != null && arrayList2 != null && arrayList3 != null) {
+				&& notificaciones != null && grupos != null && gastos != null && pagos != null) {
 			if(checkCorreoElectronico(correoElectronico) && checkDatosBancarios(datosBancarios) && checkContrasena(contrasena)) {
 				this.id = id;
 				this.nombreUsuario = nombreUsuario;
@@ -40,11 +40,11 @@ public class Usuario implements IUsuario {
 				this.datosBancarios = datosBancarios;
 				this.notificaciones = new ArrayList<>();
 				this.grupos = new ArrayList<>();
-				this.grupos.addAll(arrayList);
+				this.grupos.addAll(grupos);
 				this.gastos = new ArrayList<>();
-				this.gastos.addAll(arrayList2);
+				this.gastos.addAll(gastos);
 				this.pagos = new ArrayList<>();
-				this.pagos.addAll(arrayList3);
+				this.pagos.addAll(pagos);
 			}
 		}
 	}
@@ -221,7 +221,7 @@ public class Usuario implements IUsuario {
 	
 	/**
 	 * Verifica si el código IBAN dado es correcto. Para ser correcto debe seguir el formato:
-	 * LLNNNNNNNNNNNNNNNNNNNNNN, es decir, 2 letras (L) y 22 números (N)
+	 * LLNNNNNNNNNNNNNNNNNNNNNN, es decir, 2 letras mayúsculas (L) y 22 números (N)
 	 * En realidad, habría que realizar más comprobaciones, pero son complejas ya que dependen del país de origen de la cuenta 
 	 * (indicado con las dos primeras letras) y de otros parámetros
 	 * 
@@ -231,8 +231,8 @@ public class Usuario implements IUsuario {
 	private boolean checkDatosBancarios(String datosBancarios) {
 		if(datosBancarios.length()!=24) return false;
 		
-		// Los dos primeros caracteres del String son números y los otros 22 números
-		String verificacion = "^[a-zA-Z]{2}\\d{22}$";
+		// Los dos primeros caracteres del String son letrsa y los otros 22 números
+		String verificacion = "^[A-Z]{2}\\d{22}$";
 		if(datosBancarios.matches(verificacion))
 			return true;
 		
