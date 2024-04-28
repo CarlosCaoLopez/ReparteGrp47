@@ -1,7 +1,0 @@
-package operaciones;
-
-public interface ItfArit {
-	int suma(int a, int b);
-	int resta(int a, int b);
-
-}
