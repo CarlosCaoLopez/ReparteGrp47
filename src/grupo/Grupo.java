@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import gasto.IGasto;
 import pago.IPago;
+import pago.Pago;
 import usuario.IUsuario;
 
 public class Grupo implements IGrupo {
@@ -18,31 +19,6 @@ public class Grupo implements IGrupo {
 	
 	
 	// Constructores
-	
-	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IGasto> gastos, ArrayList<IUsuario> usuarios, ArrayList<IPago> pagos) {
-		boolean flag = true;
-		
-		if(gastos != null && usuarios != null) {
-		/* Comprobar que el pagador de cada gasto se encuentra dentro de los usuarios */
-			for(IGasto gasto:gastos) {
-				if(!usuarios.contains(gasto.getPagador())) {
-					flag = false;
-				}
-			}
-			if(id > 0 && nombreGrupo != null && descripcion != null && pagos != null && flag) {
-				this.id = id;
-				this.nombreGrupo = nombreGrupo;
-				this.descripcion = descripcion;
-				this.gastos = new ArrayList<>();
-				this.gastos.addAll(gastos);
-				this.usuarios = new ArrayList<>();
-				this.usuarios.addAll(usuarios);
-				this.pagos = new ArrayList<>();
-				this.pagos.addAll(pagos);
-			}
-		}
-	}
-
 	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios) {
 		
 		if(id > 0 && nombreGrupo != null && descripcion != null && usuarios != null) {
@@ -123,10 +99,15 @@ public class Grupo implements IGrupo {
 
 	}
 
+	//funcion para repartir los gastos en un pago
 	@Override
 	public void dividirGasto() {
-		
-
+		if(!this.gastos.isEmpty()) {//chequeamos si hay gastos
+			String resultado=""+this.id+this.pagos.size();//generamos una string id de pago
+			IPago nuevopago=new Pago(Integer.valueOf(resultado),this);//generamos el tipo pago
+			nuevopago.repartirGasto(this.gastos);//rellenamos el tipo pago
+			this.gastos=new ArrayList<IGasto>();//reseteamos la lista de gastos
+		}
 	}
 	
 	@Override
