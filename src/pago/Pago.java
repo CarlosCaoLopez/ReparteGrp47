@@ -1,6 +1,7 @@
 package pago;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import grupo.IGrupo;
@@ -10,47 +11,29 @@ public class Pago implements IPago {
 
 	
 	private int id;
-	private String servicio;
-	private Double cantidad;
-	private IUsuario acreedor;
-	private ArrayList<IUsuario> deudores;
+	private Double total;
+	private HashMap<IUsuario, Double> cuentas;
 	private IGrupo grupoGasto;
 	
 	
-	//constructor del pago
-	public Pago(String servicio,Double cantidad,IUsuario acreedor, ArrayList<IUsuario> deudores,IGrupo grupoGasto) {
-		
-		//chequeos de que la cantidad, acreedor y lista existen
-		if(cantidad!=null&&acreedor!=null&&deudores!=null&&grupoGasto!=null) {
-			//chequeos de que la cantidad no es nula y hay deudores
-			if (cantidad>0&&deudores.size()>0) {
-				Random ran=new Random();
-				this.id= ran.nextInt(1000000);
-				this.servicio=servicio;
-				this.cantidad=cantidad;
-				this.acreedor=acreedor;
-				this.deudores=deudores;
-				this.grupoGasto=grupoGasto;
-			}
-		}
-	}
 	
-	//constructor pero sin la string servicio
-	public Pago(Double cantidad,IUsuario acreedor, ArrayList<IUsuario> deudores,IGrupo grupoGasto) {
+	
+	
+	//constructor del pago
+	public Pago(int id, IGrupo grupoGasto) {
 		
-		//chequeos de que la cantidad, acreedor y lista existen
-		if(cantidad!=null&&acreedor!=null&&deudores!=null&&grupoGasto!=null) {
-			//chequeos de que la cantidad no es nula y hay deudores
-			if (cantidad>0&&deudores.size()>0) {
-				Random ran=new Random();
-				this.id= ran.nextInt(1000000);
-				this.cantidad=cantidad;
-				this.acreedor=acreedor;
-				this.deudores=deudores;
-				this.grupoGasto=grupoGasto;
-			}
+		if(id>0&&grupoGasto!=null) {
+		this.id = id;
+		this.total = 0.0;
+		this.cuentas = new HashMap<>();
+		for(Usuario user in grupoGasto.)
+		this.grupoGasto = grupoGasto;
 		}
 	}
+
+	
+	
+	
 	
 	
 	
