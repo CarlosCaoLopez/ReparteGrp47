@@ -43,18 +43,19 @@ public class Grupo implements IGrupo {
 		}
 	}
 
-	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IGasto> gastos, ArrayList<IPago> pagos) {
+	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios) {
 		
-		if(id > 0 && nombreGrupo != null && descripcion != null && pagos != null) {
-			this.id = id;
-			this.nombreGrupo = nombreGrupo;
-			this.descripcion = descripcion;
-			this.gastos = new ArrayList<>();
-			this.gastos.addAll(gastos);
-			this.usuarios = new ArrayList<>();
-			this.usuarios.addAll(usuarios);
-			this.pagos = new ArrayList<>();
-			this.pagos.addAll(pagos);					
+		if(id > 0 && nombreGrupo != null && descripcion != null && usuarios != null) {
+			if(!usuarios.isEmpty()) {
+				this.id = id;
+				this.nombreGrupo = nombreGrupo;
+				this.descripcion = descripcion;
+				this.gastos = new ArrayList<>();
+				this.usuarios = new ArrayList<>();
+				this.usuarios.addAll(usuarios);
+				this.pagos = new ArrayList<>();		
+			}
+						
 		}
 	}
 	

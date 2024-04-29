@@ -1,5 +1,6 @@
 package usuario;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import grupo.IGrupo;
 import pago.IPago;
@@ -11,4 +12,17 @@ public interface IUsuario {
 	public void gestionarGrupo(IGrupo grupo, String descripcion, ArrayList<IUsuario> nuevosUsuarios);
 	public void notificar(String notificacion);
 	public IPago realizarPago(IGasto gasto); 
+	
+	// Getters
+	public int getId();
+	public String getNombreUsuario();
+	public String getNombreReal();
+	public String getCorreoElectronico();
+	public LocalDate getFechaNacimiento();
+	public String getContrasena();
+	public String getDatosBancarios();
+	public ArrayList<String> getNotificaciones();
+	public ArrayList<IGrupo> getGrupos();
+	public ArrayList<IGasto> getGastos();
+	public ArrayList<IPago> getPagos();
 }
