@@ -14,14 +14,14 @@ public class Grupo implements IGrupo {
 	private String descripcion;
 	private ArrayList<IGasto> gastos;
 	private ArrayList<IUsuario> usuarios;
-	private ArrayList<IUsuario> lideres;
+	private ArrayList<IPago> pagos;
 	
 	
 	// Constructores
 	
-	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IGasto> gastos, ArrayList<IUsuario> usuarios, ArrayList<IUsuario> lideres) {
+	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IGasto> gastos, ArrayList<IUsuario> usuarios, ArrayList<IPago> pagos) {
 		
-		if(id > 0 && nombreGrupo != null && descripcion != null && gastos != null && usuarios != null && lideres != null) {
+		if(id > 0 && nombreGrupo != null && descripcion != null && gastos != null && usuarios != null) {
 			this.id = id;
 			this.nombreGrupo = nombreGrupo;
 			this.descripcion = descripcion;
@@ -29,15 +29,14 @@ public class Grupo implements IGrupo {
 			this.gastos.addAll(gastos);
 			this.usuarios = new ArrayList<>();
 			this.usuarios.addAll(usuarios);
-			this.lideres = new ArrayList<>();
-			this.lideres.addAll(usuarios);
-					
+			this.pagos = new ArrayList<>();
+			this.pagos.addAll(pagos);
 		}
 	}
 
-	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> lideres) {
+	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IPago> pagos) {
 		
-		if(id > 0 && nombreGrupo != null && descripcion != null && lideres != null) {
+		if(id > 0 && nombreGrupo != null && descripcion != null && pagos != null) {
 			this.id = id;
 			this.nombreGrupo = nombreGrupo;
 			this.descripcion = descripcion;
@@ -45,9 +44,8 @@ public class Grupo implements IGrupo {
 			this.gastos.addAll(gastos);
 			this.usuarios = new ArrayList<>();
 			this.usuarios.addAll(usuarios);
-			this.lideres = new ArrayList<>();
-			this.lideres.addAll(usuarios);
-					
+			this.pagos = new ArrayList<>();
+			this.pagos.addAll(pagos);					
 		}
 	}
 	
@@ -91,7 +89,7 @@ public class Grupo implements IGrupo {
 
 	@Override
 	public void anadirPago(IPago pago) {
-
+		
 
 	}
 	
