@@ -124,7 +124,7 @@ public class Grupo implements IGrupo {
 	}
 
 	@Override
-	public void anadirPago(IPago pago) {
+	public void dividirGasto() {
 		
 
 	}
