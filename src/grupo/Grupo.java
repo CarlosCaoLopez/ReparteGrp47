@@ -49,6 +49,32 @@ public class Grupo implements IGrupo {
 		}
 	}
 	
+	//Getters 
+
+	public int getId() {
+		return id;
+	}
+
+	public String getNombreGrupo() {
+		return nombreGrupo;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public ArrayList<IGasto> getGastos() {
+		return gastos;
+	}
+
+	public ArrayList<IUsuario> getUsuarios() {
+		return usuarios;
+	}
+
+	public ArrayList<IPago> getPagos() {
+		return pagos;
+	}
+	
 	// Métodos
 	
 	@Override
