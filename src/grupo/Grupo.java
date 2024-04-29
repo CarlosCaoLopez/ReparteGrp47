@@ -30,8 +30,7 @@ public class Grupo implements IGrupo {
 				this.usuarios = new ArrayList<>();
 				this.usuarios.addAll(usuarios);
 				this.pagos = new ArrayList<>();		
-			}
-						
+			}		
 		}
 	}
 	
@@ -107,6 +106,10 @@ public class Grupo implements IGrupo {
 			IPago nuevopago=new Pago(Integer.valueOf(resultado),this);//generamos el tipo pago
 			nuevopago.repartirGasto(this.gastos);//rellenamos el tipo pago
 			this.gastos=new ArrayList<IGasto>();//reseteamos la lista de gastos
+			
+			for(IUsuario user : this.usuarios) {
+				user.notificar("Se han actualizado los pagos en el grupo "+this.id);
+			}
 		}
 	}
 	
