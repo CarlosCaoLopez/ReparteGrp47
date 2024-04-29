@@ -20,21 +20,30 @@ public class Grupo implements IGrupo {
 	// Constructores
 	
 	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IGasto> gastos, ArrayList<IUsuario> usuarios, ArrayList<IPago> pagos) {
+		boolean flag = true;
 		
-		if(id > 0 && nombreGrupo != null && descripcion != null && gastos != null && usuarios != null) {
-			this.id = id;
-			this.nombreGrupo = nombreGrupo;
-			this.descripcion = descripcion;
-			this.gastos = new ArrayList<>();
-			this.gastos.addAll(gastos);
-			this.usuarios = new ArrayList<>();
-			this.usuarios.addAll(usuarios);
-			this.pagos = new ArrayList<>();
-			this.pagos.addAll(pagos);
+		if(gastos != null && usuarios != null) {
+		/* Comprobar que el pagador de cada gasto se encuentra dentro de los usuarios */
+			for(IGasto gasto:gastos) {
+				if(!usuarios.contains(gasto.getPagador())) {
+					flag = false;
+				}
+			}
+			if(id > 0 && nombreGrupo != null && descripcion != null && pagos != null && flag) {
+				this.id = id;
+				this.nombreGrupo = nombreGrupo;
+				this.descripcion = descripcion;
+				this.gastos = new ArrayList<>();
+				this.gastos.addAll(gastos);
+				this.usuarios = new ArrayList<>();
+				this.usuarios.addAll(usuarios);
+				this.pagos = new ArrayList<>();
+				this.pagos.addAll(pagos);
+			}
 		}
 	}
 
-	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IPago> pagos) {
+	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IGasto> gastos, ArrayList<IPago> pagos) {
 		
 		if(id > 0 && nombreGrupo != null && descripcion != null && pagos != null) {
 			this.id = id;

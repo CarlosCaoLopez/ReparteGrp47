@@ -36,12 +36,9 @@ class GrupoTest {
 		@DisplayName()
 		@NullAndEmptySource
 		@CsvSource({})
-		void testCrearGrupo(String correo) {
+		void testCrearGrupo() {
 			// Crear un mock para simular un usuario correcto 
-			
-			assertAll( () ->{assertNull("Un correo no válido ha sido validado (Constructor general)", usuario1.getCorreoElectronico());},
-					()->{assertNull("Un correo no válido ha sido validado (Constructor específico)", usuario2.getCorreoElectronico());}); 
-			
+			Usuario
 		}
 	}
 	
