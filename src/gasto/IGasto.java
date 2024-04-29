@@ -15,4 +15,11 @@ public interface IGasto {
 	public void modificarServicio(String nuevoservicio);
 	public void modificarPagador(IUsuario nuevopagador);
 	public IGasto registrarGasto(IGrupo grupo);
+	
+	//getters
+	public int getId();
+	public double getCantidad();
+	public IGrupo getGrupoGasto();
+	public IUsuario getPagador();
+	public String getServicio();
 }

@@ -80,6 +80,27 @@ public class Gasto implements IGasto {
 		return this;
 	}
 	
+	@Override
+	public int getId(){
+		return this.id;
+	}
+	@Override
+	public double getCantidad(){
+		return this.cantidad;
+	}
+	@Override
+	public IGrupo getGrupoGasto(){
+		return this.grupoGasto;
+	}
+	@Override
+	public IUsuario getPagador(){
+		return this.pagador;
+	}
+	@Override
+	public String getServicio(){
+		return this.servicio;
+	}
+	
 	
 	
 	// equals de gastos (es literalmente el de usuario ya que ambos usan id)
