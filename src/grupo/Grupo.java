@@ -77,6 +77,14 @@ public class Grupo implements IGrupo {
 			this.usuarios.remove(usuario);
 		}
 	}
+	
+	@Override
+	public void modificarDescripcion(String descripcion){
+		if(descripcion != null) {
+			this.descripcion = descripcion;
+		}
+
+	}
 
 	@Override
 	public void anadirGasto(IGasto gasto) {
@@ -86,14 +94,24 @@ public class Grupo implements IGrupo {
 
 	}
 
+	/*
+	 * @Override public void modificarGasto(IGasto gasto) { if(gasto != null) {
+	 * 
+	 * int indice = this.gastos.indexOf(gasto); // Obtenemos el índice donde se
+	 * encuentra el objeto if(indice != -1) { // Si el objeto existe en el ArrayList
+	 * this.gastos.set(indice, gasto); // Lo sustituímos } }
+	 * 
+	 * }
+	 */
+
 	@Override
-	public void modificarGasto(IGasto gasto) {
-		if(gasto != null) {
-			
-			int indice = this.gastos.indexOf(gasto); // Obtenemos el índice donde se encuentra el objeto
-			if(indice != -1) { // Si el objeto existe en el ArrayList
-				this.gastos.set(indice, gasto); // Lo sustituímos
-			}
+	public void dividirGastos() {
+		IPago pago = new Pago(this.id+this.gastos.size(), this);
+		if(pago != null) {
+			pago.repartirGastos();
+			this.pagos.add(pago);
+			// Vaciamos la lista de gastos, pues ya se han computado en el pago
+			this.gastos.clear();
 		}
 
 	}
@@ -101,25 +119,13 @@ public class Grupo implements IGrupo {
 	//funcion para repartir los gastos en un pago
 	@Override
 	public void dividirGasto() {
-		if(!this.gastos.isEmpty()) {//chequeamos si hay gastos
-			String resultado=""+this.id+this.pagos.size();//generamos una string id de pago
-			IPago nuevopago=new Pago(Integer.valueOf(resultado),this);//generamos el tipo pago
-			nuevopago.repartirGasto(this.gastos);//rellenamos el tipo pago
-			this.gastos=new ArrayList<IGasto>();//reseteamos la lista de gastos
-			
-			for(IUsuario user : this.usuarios) {
-				user.notificar("Se han actualizado los pagos en el grupo "+this.id);
-			}
+		IPago pago = new Pago(this.id+this.gastos.size(), this);
+		if(pago != null) {
+			pago.repartirGastos();
 		}
 	}
 	
-	@Override
-	public void modificarDescripcion(String descripcion){
-		if(descripcion != null) {
-			this.descripcion = descripcion;
-		}
-
-	}
+	
 
 	@Override
 	public int hashCode() {

@@ -1,6 +1,7 @@
 package usuario;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.time.LocalDate;
 
@@ -156,17 +157,46 @@ public class Usuario implements IUsuario {
 
 	}
 
+	
+	
 	@Override
-	public void notificar(String notificacion) {
+	public void anadirGasto(IGrupo grupo, double cantidad) {
+		IGasto gasto = new Gasto(this.id+this.gastos.size(), cantidad, grupo, this);
+		if(gasto != null) {
+			this.gastos.add(gasto);
+			grupo.anadirGasto(gasto);
+		}
+	}
+	
+	@Override
+	public void dividirGastos(IGrupo grupo) {
+		if(grupo != null) {
+			grupo.dividirGastos();
+		}
+	}
+	
+	
+	@Override
+	public void notificar(IPago pago) {
 		
-		if(notificacion != null) {
+		if(pago != null) {
+			this.pagos.add(pago);
+			String notificacion = "";
+			
+			// TODO Añadir la notificación de lo que le debe a cada persona
+
+			HashMap<IUsuario, Double> misPagos = pago.getCuotas().get(this);
+			for(IUsuario user : misPagos.keySet()) {
+				notificacion += "Pago pendiente de " + misPagos.get(user) + " a " + user.getNombreReal() + "\n";
+ 			}
+			notificacion += "\n";
 			this.notificaciones.add(notificacion);
 		}
-
+		
 	}
 
 	@Override
-	public IPago realizarPago(IGasto gasto) {
+	public IPago realizarPago(IPago pago) {
 //		
 //		if(gasto != null) {
 //			
