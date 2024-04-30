@@ -19,35 +19,33 @@ public class Gasto implements IGasto {
 	//necesita una cifra de cuanto es el gasto
 	//necesita el grupo al que se va a asignar el gasto
 	//necesita el usuario que va a pagar el gasto
-	public Gasto(double importe, IGrupo grupo, IUsuario pagando,String negocio) {
+	public Gasto(int id, double importe, IGrupo grupo, IUsuario pagando,String negocio) {
 		
 		//si el grupo, pagador existen y el importe es mayor a cero
 		//creamos su id aleatorio y asignamos el resto
 		//es posible que el nombre de negocio quede a null
-		if(grupo!=null&&pagando!=null&&importe>0) {
-		Random ran=new Random();
-		this.id= ran.nextInt(1000000);
-		this.cantidad=importe;
-		this.grupoGasto=grupo;
-		this.pagador=pagando;
-		this.servicio=negocio;
+		if(id>0 && grupo!=null && pagando!=null && importe>0) {
+			this.id = id;
+			this.cantidad = importe;
+			this.grupoGasto = grupo;
+			this.pagador = pagando;
+			this.servicio = negocio;
 		}
 		
 	}
 	
 	//version del constructor que no pone un negocio
-	public Gasto(double importe, IGrupo grupo, IUsuario pagando) {
+	public Gasto(int id, double importe, IGrupo grupo, IUsuario pagando) {
 		
 		//si el grupo, pagador existen y el importe es mayor a cero
 		//creamos su id aleatorio y asignamos el resto
 		//es posible que el nombre de negocio quede a null
-		if(grupo!=null&&pagando!=null&&importe>0) {
-		Random ran=new Random();
-		this.id= ran.nextInt(1000000);
-		this.cantidad=importe;
-		this.grupoGasto=grupo;
-		this.pagador=pagando;
-		this.servicio=null;
+		if(id>0 && grupo!=null && pagando!=null && importe>0) {
+			this.id = id;
+			this.cantidad = importe;
+			this.grupoGasto = grupo;
+			this.pagador = pagando;
+			this.servicio = null;
 		}
 		
 	}

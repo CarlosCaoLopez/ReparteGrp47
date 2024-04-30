@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import gasto.IGasto;
 import pago.IPago;
+import pago.Pago;
 import usuario.IUsuario;
 
 public class Grupo implements IGrupo {
@@ -102,6 +103,14 @@ public class Grupo implements IGrupo {
 			this.usuarios.remove(usuario);
 		}
 	}
+	
+	@Override
+	public void modificarDescripcion(String descripcion){
+		if(descripcion != null) {
+			this.descripcion = descripcion;
+		}
+
+	}
 
 	@Override
 	public void anadirGasto(IGasto gasto) {
@@ -111,31 +120,29 @@ public class Grupo implements IGrupo {
 
 	}
 
+	/*
+	 * @Override public void modificarGasto(IGasto gasto) { if(gasto != null) {
+	 * 
+	 * int indice = this.gastos.indexOf(gasto); // Obtenemos el índice donde se
+	 * encuentra el objeto if(indice != -1) { // Si el objeto existe en el ArrayList
+	 * this.gastos.set(indice, gasto); // Lo sustituímos } }
+	 * 
+	 * }
+	 */
+
 	@Override
-	public void modificarGasto(IGasto gasto) {
-		if(gasto != null) {
-			
-			int indice = this.gastos.indexOf(gasto); // Obtenemos el índice donde se encuentra el objeto
-			if(indice != -1) { // Si el objeto existe en el ArrayList
-				this.gastos.set(indice, gasto); // Lo sustituímos
-			}
+	public void dividirGastos() {
+		IPago pago = new Pago(this.id+this.gastos.size(), this);
+		if(pago != null) {
+			pago.repartirGastos();
+			this.pagos.add(pago);
+			// Vaciamos la lista de gastos, pues ya se han computado en el pago
+			this.gastos.clear();
 		}
-
-	}
-
-	@Override
-	public void dividirGasto() {
-		
 
 	}
 	
-	@Override
-	public void modificarDescripcion(String descripcion){
-		if(descripcion != null) {
-			this.descripcion = descripcion;
-		}
-
-	}
+	
 
 	@Override
 	public int hashCode() {

@@ -2,6 +2,7 @@ package usuario;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+
 import grupo.IGrupo;
 import pago.IPago;
 import gasto.IGasto;
@@ -10,8 +11,10 @@ public interface IUsuario {
 	
 	public IGrupo crearGrupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> lideres);
 	public void gestionarGrupo(IGrupo grupo, String descripcion, ArrayList<IUsuario> nuevosUsuarios);
-	public void notificar(String notificacion);
-	public IPago realizarPago(IGasto gasto); 
+	public void anadirGasto(IGrupo grupo, double cantidad); 
+	public void dividirGastos(IGrupo grupo);
+	public void notificar(IPago pago);
+	public IPago realizarPago(IPago pago);
 	
 	// Getters
 	public int getId();
