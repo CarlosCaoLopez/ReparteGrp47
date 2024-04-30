@@ -129,10 +129,10 @@ public class Usuario implements IUsuario {
 	// Métodos 
 
 	@Override
-	public IGrupo crearGrupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> lideres) {
+	public IGrupo crearGrupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios) {
 		
 		// Creamos el grupo
-		IGrupo grupo = new Grupo(id, nombreGrupo, descripcion, lideres);
+		IGrupo grupo = new Grupo(id, nombreGrupo, descripcion, usuarios);
 		
 		
 		this.grupos.add(grupo); // Añadimos el grupo al conjunto de grupos del usuario
