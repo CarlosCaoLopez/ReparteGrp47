@@ -21,7 +21,7 @@ public class Grupo implements IGrupo {
 	// Constructores
 	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios) {
 		
-		if(id > 0 && nombreGrupo != null && descripcion != null && usuarios != null) {
+		if(id > 0 && nombreGrupo != null && !nombreGrupo.isEmpty() && descripcion != null && !descripcion.isEmpty() && usuarios != null) {
 			if(!usuarios.isEmpty()) {
 				this.id = id;
 				this.nombreGrupo = nombreGrupo;

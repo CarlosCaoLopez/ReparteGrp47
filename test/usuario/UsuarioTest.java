@@ -77,7 +77,7 @@ class UsuarioTest {
 		@ParameterizedTest
 		@DisplayName("Verificación de datos bancarios no válidos")
 		@NullAndEmptySource
-		@CsvSource({"ESP01234567890123456789", "P01234567890123456789", "ES012345678901234567890", "ES0123456789012345678", "E0S1234567890123456789", "!ES01234567890123456789"})
+		@CsvSource({"ESP01234567890123456789", "P01234567890123456789", "ES012345678901234567890", "ES0123456789012345678", "E0S1234567890123456789", "!ES01234567890123456789", "eS0123456789012345678901"})
 		void testDatosNoValido(String datos) {
 			usuario1 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", datos, 
 					notificaciones, grupos, gastos, pagos);

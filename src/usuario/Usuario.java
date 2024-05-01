@@ -247,7 +247,7 @@ public class Usuario implements IUsuario {
 	private boolean checkCorreoElectronico(String correoElectronico) {
 		// Restricciones: el correo electrónico
 		if(!correoElectronico.isEmpty() && !correoElectronico.startsWith("@") && correoElectronico.contains("@") && (correoElectronico.chars().filter(c -> c == '@').count() == 1) 
-			&& correoElectronico.contains(".") && !correoElectronico.endsWith(".") && (correoElectronico.lastIndexOf("@")+1<correoElectronico.lastIndexOf(".")))
+			&& correoElectronico.contains(".") && !correoElectronico.endsWith(".") && (correoElectronico.lastIndexOf("@")+1<correoElectronico.lastIndexOf(".") && correoElectronico.indexOf("@")+1!=correoElectronico.lastIndexOf(".")))
 			return true;
 		
 		return false;
