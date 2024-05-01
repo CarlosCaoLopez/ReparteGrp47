@@ -3,10 +3,7 @@ package usuario;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
-
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -22,6 +19,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import gasto.IGasto;
 import grupo.IGrupo;
@@ -135,7 +133,7 @@ class UsuarioTest {
 	@Nested 
 	@DisplayName("Pruebas de creación de grupo desde un Usuario")
 	class crearGrupo{
-		AutoCloseable ac1;
+		AutoCloseable acl;
 		//Para las pruebas de Unidad necesitamos un mock que simule el constructor de Grupo
 		// Más tarde para las de integración, se cambiará ese mock por un Objeto real
 		@Mock
@@ -143,6 +141,16 @@ class UsuarioTest {
 		
 		@InjectMocks
 		Usuario usuario3 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "contrasena", "ES0000000000000000000000");
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			acl = MockitoAnnotations.openMocks(this);
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			acl.close();
+		}
 		
 		@Test
 		@DisplayName("Verificación de que el usuario que crea el grupo se encuentra en [usuarios]")
@@ -177,7 +185,7 @@ class UsuarioTest {
 		}
 		
 		@ParameterizedTest
-		@DisplayName("Verificación de que la descripción está no es nula ni vacía")
+		@DisplayName("Verificación de que la descripción no es nula ni vacía")
 		@CsvSource({"descripcion"})
 		void testDescripcion(String descripcion) {
 			ArrayList<IUsuario> usuarios = new ArrayList<IUsuario>();
