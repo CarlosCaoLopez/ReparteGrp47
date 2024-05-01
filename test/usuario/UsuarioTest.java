@@ -1,13 +1,6 @@
 package usuario;
 
 
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -159,8 +152,8 @@ class UsuarioTest {
 			ArrayList<IUsuario> usuarios2 = new ArrayList<IUsuario>();
 			usuarios.add(usuario3);
 			usuarios2.add(usuario4);
-			assertAll( ()->{assertNull("Usuario creador dentro de grupo invalidado", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios));},
-						()->{assertNull("Usuario creador no dentro de grupo a crear invalidado", usuario3.crearGrupo(2, "nombre", "descripcion", usuarios2));});
+			assertAll( ()->{assertNull(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios), "Usuario creador dentro de grupo invalidado");},
+						()->{assertNull(usuario3.crearGrupo(2, "nombre", "descripcion", usuarios2), "Usuario creador no dentro de grupo a crear invalidado");});
 		}	
 		
 		@ParameterizedTest
@@ -169,7 +162,7 @@ class UsuarioTest {
 		void testIdValido(int id) {
 			ArrayList<IUsuario> usuarios = new ArrayList<IUsuario>();
 			usuarios.add(usuario3);
-			assertNull("Id introducido no válido", usuario3.crearGrupo(id, "nombreGrupo", "descripcion", usuarios));
+			assertNull(usuario3.crearGrupo(id, "nombreGrupo", "descripcion", usuarios), "Id introducido no válido");
 		}
 		
 		@ParameterizedTest
@@ -178,9 +171,9 @@ class UsuarioTest {
 		void testNombre(String nombre) {
 			ArrayList<IUsuario> usuarios = new ArrayList<IUsuario>();
 			usuarios.add(usuario3);
-			assertAll( ()->{assertNull("Nombre válido introducido, no válido", usuario3.crearGrupo(1, nombre, "descripcion", usuarios));},
-						()->{assertNull("Nombre inválido introducido, no válido", usuario3.crearGrupo(1, null, "descripcion", usuarios));},
-						()->{assertNull("Nombre inválido introducido, no válido", usuario3.crearGrupo(1, "", "descripción", usuarios));});
+			assertAll( ()->{assertNull(usuario3.crearGrupo(1, nombre, "descripcion", usuarios), "Nombre válido introducido, no válido");},
+						()->{assertNull(usuario3.crearGrupo(1, null, "descripcion", usuarios), "Nombre inválido introducido, no válido");},
+						()->{assertNull(usuario3.crearGrupo(1, "", "descripción", usuarios), "Nombre inválido introducido, no válido");});
 		}
 		
 		@ParameterizedTest
@@ -189,9 +182,9 @@ class UsuarioTest {
 		void testDescripcion(String descripcion) {
 			ArrayList<IUsuario> usuarios = new ArrayList<IUsuario>();
 			usuarios.add(usuario3);			
-			assertAll( ()->{assertNull("Descripcion valida introducida, no válido", usuario3.crearGrupo(1, "nombre", descripcion, usuarios));},
-						()->{assertNull("Descripcion invalida introducida, no válido", usuario3.crearGrupo(1, "nombre","", usuarios));},
-						()->{assertNull("Descripcion inválida introducida, no válido", usuario3.crearGrupo(1, "nombre", null, usuarios));}
+			assertAll( ()->{assertNull(usuario3.crearGrupo(1, "nombre", descripcion, usuarios), "Descripcion valida introducida, no válido");},
+						()->{assertNull(usuario3.crearGrupo(1, "nombre","", usuarios), "Descripcion invalida introducida, no válido");},
+						()->{assertNull(usuario3.crearGrupo(1, "nombre", null, usuarios), "Descripcion inválida introducida, no válido");}
 					);
 		}		
 	}
