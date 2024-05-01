@@ -116,14 +116,6 @@ public class Grupo implements IGrupo {
 
 	}
 
-	//funcion para repartir los gastos en un pago
-	@Override
-	public void dividirGasto() {
-		IPago pago = new Pago(this.id+this.gastos.size(), this);
-		if(pago != null) {
-			pago.repartirGastos();
-		}
-	}
 	
 	
 

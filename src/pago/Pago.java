@@ -94,7 +94,8 @@ public class Pago implements IPago {
 				for(IGasto gasto : gastos) {
 					IUsuario pagador = gasto.getPagador(); // Separamos al pagador
 					double cantidad = gasto.getCantidad(); // Obtenemos el gasto realizado por el pagador
-					cantidad=cantidad/n; // Lo dividimos entre el número de miembros
+					total += cantidad; // Actualizamos el total de dinero en el pago
+					cantidad=cantidad/n; // Dividimos la cantidad entre el número de miembros
 					
 					for(IUsuario user: grupoGasto.getUsuarios()) {
 						// Por cada miembro del grupo que no sea el pagador, se le imputa el gasto.
