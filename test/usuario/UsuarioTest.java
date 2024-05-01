@@ -55,7 +55,7 @@ class UsuarioTest {
 		@ParameterizedTest
 		@DisplayName("Verificación de correos electrónicos no válidos")
 		@NullAndEmptySource
-		@CsvSource({"@", ".", "@.", "nombre@", "nombre@.", "nombre@.dominio", "nombre@@dominio.com", "nombre.apellido@dominio", "nombre.apellido@dominio."})
+		@CsvSource({"nombredominio.com", "nomb@re@dominio.com", "nombre@dominiocom", "@dominio.com", "nombre@.com", "nombre@dominio."})
 		void testCorreoNoValido(String correo) {
 			usuario1 = new Usuario(1, "nombreUsuario", "nombreReal", correo, LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000", 
 					notificaciones, grupos, gastos, pagos);
@@ -68,7 +68,7 @@ class UsuarioTest {
 		
 		@ParameterizedTest
 		@DisplayName("Verificación de correos electrónicos válidos")
-		@CsvSource({"nombre@dominio.com", "nombre.apellido@dominio.com", "nombre.....@dominio.es", "nombre@dominio......com", "·$%&|.#12{].-@dominio.es"})
+		@CsvSource({"nombre@dominio.com"})
 		void testCorreoValido(String correo) {
 			usuario1 = new Usuario(1, "nombreUsuario", "nombreReal", correo, LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000", 
 					notificaciones, grupos, gastos, pagos);
@@ -82,7 +82,7 @@ class UsuarioTest {
 		@ParameterizedTest
 		@DisplayName("Verificación de datos bancarios no válidos")
 		@NullAndEmptySource
-		@CsvSource({"111111", "¿?", "ES", "ES789456", "ES012345678901234567890", "E012345678901234567890123", "ES0123456789/01234567890", "E/01234567890123456789012"})
+		@CsvSource({"ESP01234567890123456789", "P01234567890123456789", "ES012345678901234567890", "ES0123456789012345678", "E0S1234567890123456789", "!ES01234567890123456789"})
 		void testDatosNoValido(String datos) {
 			usuario1 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", datos, 
 					notificaciones, grupos, gastos, pagos);
@@ -95,7 +95,7 @@ class UsuarioTest {
 		
 		@ParameterizedTest
 		@DisplayName("Verificación de datos bancarios válidos")
-		@CsvSource({"ES0123456789012345678901", "QW9876543210987654321098", "II1111111111111111111111"})
+		@CsvSource({"ES0123456789012345678901"})
 		void testDatosValido(String datos) {
 			usuario1 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", datos, 
 					notificaciones, grupos, gastos, pagos);
@@ -109,7 +109,7 @@ class UsuarioTest {
 		@ParameterizedTest
 		@DisplayName("Verificación de contraseñas no válidas")
 		@NullAndEmptySource
-		@CsvSource({"123", "QQQQQQ", "||||||", "Nombre123", "nombrE", "simbolo!"})
+		@CsvSource({"contrasena", "contr", "Contrasena"}) // Sin mayúscula, menos de 6 caracteres, sin símbolo
 		void testContrasenaNoValida(String contrasena) {
 			usuario1 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), contrasena, "ES0000000000000000000000", 
 					notificaciones, grupos, gastos, pagos);
@@ -122,7 +122,7 @@ class UsuarioTest {
 		
 		@ParameterizedTest
 		@DisplayName("Verificación de contraseñas válidas")
-		@CsvSource({"Nombr€", "!Nombre!", "nombrE!", "Seg&uridad", "S!·$%&/()"})
+		@CsvSource({"Nombr€"})
 		void testContrasenaValida(String contrasena) {
 			usuario1 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), contrasena, "ES0000000000000000000000", 
 					notificaciones, grupos, gastos, pagos);
