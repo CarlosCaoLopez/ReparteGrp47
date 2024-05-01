@@ -2,10 +2,11 @@ package usuario;
 
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ import gasto.IGasto;
 
 class UsuarioTest {
 	// Fixtures
-	Usuario usuario1, usuario2;
+	IUsuario usuario1, usuario2;
 	ArrayList<String> notificaciones = new ArrayList<>();
 	// No necesitamos mocks ni que las clases estén implementadas, porque solo los vamos a crear
 	ArrayList<IGrupo> grupos = new ArrayList<>();
@@ -61,8 +62,8 @@ class UsuarioTest {
 					notificaciones, grupos, gastos, pagos);
 			usuario2 = new Usuario(2, "nombreUsuario", "nombreReal", correo, LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
 			
-			assertAll( () ->{assertNull("Un correo no válido ha sido validado (Constructor general)", usuario1.getCorreoElectronico());},
-					()->{assertNull("Un correo no válido ha sido validado (Constructor específico)", usuario2.getCorreoElectronico());}); 
+			assertAll( () ->{assertNull(usuario1.getCorreoElectronico(), "Un correo no válido ha sido validado (Constructor general)");},
+					()->{assertNull(usuario2.getCorreoElectronico(), "Un correo no válido ha sido validado (Constructor específico)");}); 
 			
 		}
 		
@@ -74,8 +75,8 @@ class UsuarioTest {
 					notificaciones, grupos, gastos, pagos);
 			usuario2 = new Usuario(2, "nombreUsuario", "nombreReal", correo, LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
 			
-			assertAll( () ->{assertEquals("Un correo válido ha sido invalidado (Constructor general)", correo, usuario1.getCorreoElectronico());},
-					()->{assertEquals("Un correo válido ha sido invalidado (Constructor específico)", correo, usuario2.getCorreoElectronico());}); 
+			assertAll( () ->{assertEquals(correo, usuario1.getCorreoElectronico(), "Un correo válido ha sido invalidado (Constructor general)");},
+					()->{assertEquals(correo, usuario2.getCorreoElectronico(), "Un correo válido ha sido invalidado (Constructor específico)");}); 
 			
 		}
 		
@@ -88,8 +89,8 @@ class UsuarioTest {
 					notificaciones, grupos, gastos, pagos);
 			usuario2 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", datos);
 			
-			assertAll( () ->{assertNull("Unos datos bancarios no válidos han sido validados (Constructor general)", usuario1.getDatosBancarios());},
-					()->{assertNull("Unos datos bancarios no válidos han sido validados (Constructor específico)", usuario2.getDatosBancarios());}); 
+			assertAll( () ->{assertNull(usuario1.getDatosBancarios(), "Unos datos bancarios no válidos han sido validados (Constructor general)");},
+					()->{assertNull(usuario2.getDatosBancarios(), "Unos datos bancarios no válidos han sido validados (Constructor específico)");}); 
 			
 		}
 		
@@ -101,8 +102,8 @@ class UsuarioTest {
 					notificaciones, grupos, gastos, pagos);
 			usuario2 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", datos);
 			
-			assertAll( () ->{assertEquals("Unos datos bancarios válidos han sido invalidados (Constructor general)", datos, usuario1.getDatosBancarios());},
-					()->{assertEquals("Unos datos bancarios válidos han sido invalidados (Constructor específico)", datos, usuario2.getDatosBancarios());}); 
+			assertAll( () ->{assertEquals(datos, usuario1.getDatosBancarios(), "Unos datos bancarios válidos han sido invalidados (Constructor general)");},
+					()->{assertEquals(datos, usuario2.getDatosBancarios(), "Unos datos bancarios válidos han sido invalidados (Constructor específico)");}); 
 			
 		}
 		
@@ -115,8 +116,8 @@ class UsuarioTest {
 					notificaciones, grupos, gastos, pagos);
 			usuario2 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), contrasena, "ES0000000000000000000000");
 			
-			assertAll( () ->{assertNull("Una contraseña no válida ha sido validada (Constructor general)", usuario1.getContrasena());},
-					()->{assertNull("Una contraseña no válida ha sido validada (Constructor específico)", usuario2.getContrasena());}); 
+			assertAll( () ->{assertNull(usuario1.getContrasena(), "Una contraseña no válida ha sido validada (Constructor general)");},
+					()->{assertNull(usuario2.getContrasena(), "Una contraseña no válida ha sido validada (Constructor específico)");}); 
 			
 		}
 		
@@ -128,8 +129,8 @@ class UsuarioTest {
 					notificaciones, grupos, gastos, pagos);
 			usuario2 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), contrasena, "ES0000000000000000000000");
 			
-			assertAll( () ->{assertEquals("Una contraseña válida ha sido invalidada (Constructor general)", contrasena, usuario1.getContrasena());},
-					()->{assertEquals("Una contraseña válida ha sido invalidada (Constructor específico)", contrasena, usuario2.getContrasena());}); 
+			assertAll( () ->{assertEquals(contrasena, usuario1.getContrasena(), "Una contraseña válida ha sido invalidada (Constructor general)");},
+					()->{assertEquals(contrasena, usuario2.getContrasena(), "Una contraseña válida ha sido invalidada (Constructor específico)");}); 
 			
 		}
 		
