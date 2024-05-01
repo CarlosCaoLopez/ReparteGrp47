@@ -9,7 +9,7 @@ import gasto.IGasto;
 
 public interface IUsuario {	
 	
-	public IGrupo crearGrupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> lideres);
+	public IGrupo crearGrupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios);
 	public void gestionarGrupo(IGrupo grupo, String descripcion, ArrayList<IUsuario> nuevosUsuarios);
 	public void anadirGasto(IGrupo grupo, double cantidad); 
 	public void dividirGastos(IGrupo grupo);
