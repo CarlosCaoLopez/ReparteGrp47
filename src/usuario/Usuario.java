@@ -132,13 +132,17 @@ public class Usuario implements IUsuario {
 	@Override
 	public IGrupo crearGrupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios) {
 		
-		// Creamos el grupo
-		IGrupo grupo = new Grupo(id, nombreGrupo, descripcion, usuarios);
-		
-		
-		this.grupos.add(grupo); // Añadimos el grupo al conjunto de grupos del usuario
-		return grupo; // return del grupo creado
-		
+		if(id > 0 && nombreGrupo != null && descripcion != null && usuarios != null && usuarios.contains(this)) {
+			// Creamos el grupo
+			IGrupo grupo = new Grupo(id, nombreGrupo, descripcion, usuarios);
+			
+			
+			this.grupos.add(grupo); // Añadimos el grupo al conjunto de grupos del usuario
+			return grupo; // return del grupo creado
+		}
+		else {
+			return null;
+		}
 
 	}
 
