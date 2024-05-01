@@ -60,8 +60,26 @@ public class Grupo implements IGrupo {
 		return pagos;
 	}
 	
+	// Setters
+	
+	
 	// Métodos
 	
+	public void setGastos(ArrayList<IGasto> gastos) {
+		if(gastos != null)
+			this.gastos = gastos;
+	}
+
+	public void setUsuarios(ArrayList<IUsuario> usuarios) {
+		if(usuarios != null)
+			this.usuarios = usuarios;
+	}
+
+	public void setPagos(ArrayList<IPago> pagos) {
+		if(pagos != null)
+			this.pagos = pagos;
+	}
+
 	@Override
 	public void anadirMiembro(IUsuario nuevoUsuario) {
 		

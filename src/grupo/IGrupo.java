@@ -24,4 +24,9 @@ public interface IGrupo {
 	public ArrayList<IUsuario> getUsuarios();
 	public ArrayList<IPago> getPagos();
 	
+	// Setters
+	public void setGastos(ArrayList<IGasto> gastos);
+	public void setUsuarios(ArrayList<IUsuario> usuarios);
+	public void setPagos(ArrayList<IPago> pagos);
+	
 }
