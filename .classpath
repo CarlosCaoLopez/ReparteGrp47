@@ -12,5 +12,9 @@
 	<classpathentry kind="lib" path="C:/Users/Yago/OneDrive/Escritorio/EnSo/Practica 7/ReparteGrp47/Mockito/byte-buddy-agent-1.12.22.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Yago/OneDrive/Escritorio/EnSo/Practica 7/ReparteGrp47/Mockito/mockito-core-5.1.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Yago/OneDrive/Escritorio/EnSo/Practica 7/ReparteGrp47/Mockito/objenesis-3.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Anxo/Downloads/Mockito/byte-buddy-1.12.22.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Anxo/Downloads/Mockito/byte-buddy-agent-1.12.22.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Anxo/Downloads/Mockito/mockito-core-5.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Anxo/Downloads/Mockito/objenesis-3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

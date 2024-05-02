@@ -4,6 +4,7 @@ import grupo.IGrupo;
 import usuario.IUsuario;
 import usuario.Usuario;
 
+import java.util.Objects;
 import java.util.Random;
 
 public class Gasto implements IGasto {
@@ -94,9 +95,12 @@ public class Gasto implements IGasto {
 	}
 	
 	
-	
-	// equals de gastos (es literalmente el de usuario ya que ambos usan id)
-		@Override 
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
 				return true;

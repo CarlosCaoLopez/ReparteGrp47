@@ -1,13 +1,13 @@
 package pago;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.AfterEach;
@@ -95,6 +95,54 @@ class PagoTest {
 		}
 		
 		
+	}
+		
+		
+		
+			
+			
+		@Test
+		@DisplayName("Verificación de la funcion repartirgastos con inputs válidos")
+		void testcorrecto() {
+			
+			//generacion de los usuarios
+			IUsuario eva=new Usuario(1, "evauser", "eva", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario luis=new Usuario(2, "luisuser", "luis", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario marta=new Usuario(3, "martauser", "marta", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario juan=new Usuario(4, "juanuser", "juan", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			
+			//se crea la lista a introducir en el grupo
+			ArrayList<IUsuario> lista=new ArrayList<IUsuario>();
+			lista.add(eva);
+			lista.add(luis);
+			lista.add(marta);
+			lista.add(juan);
+			IGrupo loscuatro= eva.crearGrupo(99, "LosCuatro", "grupo", lista);
+			
+			//se imputan los gastos al grupo
+			eva.anadirGasto(loscuatro, 11.30);
+			eva.anadirGasto(loscuatro, 23.15);
+			eva.anadirGasto(loscuatro, 2.05);
+			luis.anadirGasto(loscuatro, 12.0);
+			luis.anadirGasto(loscuatro, 17.49);
+			marta.anadirGasto(loscuatro, 20.22);
+			juan.anadirGasto(loscuatro, 5.75);
+			
+			eva.dividirGastos(loscuatro);
+			
+			assertAll( 
+					()->{assertFalse(luis.getNotificaciones().isEmpty(), "No se notifica a luis");},
+					()->{assertFalse(marta.getNotificaciones().isEmpty(), "No se notifica a marta");},
+					()->{assertFalse(juan.getNotificaciones().isEmpty(), "No se notifica a juan");},
+					()->{assertFalse(eva.getNotificaciones().isEmpty(), "No se notifica a eva");});
+			
+		}
+		
+		
+		
+		
+		
+		
 		// TODO no funciona este test
 		@Test
 		@DisplayName("Verificación de grupo con personas y gastos")
@@ -128,4 +176,4 @@ class PagoTest {
 		
 	}
 
-}
+
