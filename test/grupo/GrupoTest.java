@@ -49,8 +49,8 @@ class GrupoTest {
 	class Constructores{
 		
 		@Test
-		@DisplayName("Caso válido")
-		void testIdNoVálido() {
+		@DisplayName("Caso constructor válido")
+		void testIdVálido() {
 			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
 			
 			assertAll( () ->{assertEquals(4, grupo.getId(), "Un id no ha sido correctamente establecido");},
@@ -90,22 +90,13 @@ class GrupoTest {
 		}
 		
 		@ParameterizedTest
-		@DisplayName("Verificación usuarios nulo")
-		@NullSource
-		void testUsuariosNoNulosVálido(ArrayList<IUsuario> usuarios) {
+		@DisplayName("Verificación usuarios vacío o nulo")
+		@NullAndEmptySource
+		void testUsuariosNoVálido(ArrayList<IUsuario> usuarios) {
 			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuarios);
 			assertNull(grupo.getUsuarios(), "Unos usuarios no han sido validados");
 		
 		}
-		
-		@Test
-		@DisplayName("Verificación usuarios vacíos")
-		void testUsuariosNoVálido() {
-			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuarios);
-			assertEquals(0, grupo.getUsuarios().size(), "Unos usuarios no han sido validados");
-		
-		}
-		
 		
 	}
 	

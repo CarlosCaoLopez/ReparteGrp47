@@ -130,7 +130,8 @@ class GastoTest {
 	}
 	
 	
-	
+	// TODO Habría que comprobar que el gasto se ha creado correctamente, porque el grupo al que está asociado
+	// no contiene al usuario (el grupo está vacío), y diría que el gasto no se está creando correctamente
     @Test
     @DisplayName("Testeo de registrargasto")
     void testRegistrarGasto() {

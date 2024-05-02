@@ -160,7 +160,7 @@ class UsuarioTest {
 		@Test
 		@DisplayName("Verificación de que el usuario que crea el grupo se encuentra en [usuarios] (caso no válido)")
 		void testUsuarioFuera() {
-			IUsuario usuario4 = new Usuario(4, "nomeUsuario", "nomeReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "contrasena", "ES0000000000000000000000");
+			IUsuario usuario4 = new Usuario(4, "nomeUsuario", "nomeReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
 			usuarios.add(usuario4);
 			assertNull(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios), "Usuario creador del grupo no forma parte del grupo");
 		}	

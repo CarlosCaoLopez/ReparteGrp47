@@ -1,10 +1,16 @@
 package pago;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.mockito.internal.util.reflection.FieldInitializer;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -150,25 +156,20 @@ class PagoTest {
 			IGasto gastoMock = mock(Gasto.class);
 			IUsuario usuarioMock = mock(Usuario.class);
 			IGrupo grupoMock = mock(Grupo.class);
-
-			// Añadimos el mock gasto al mock grupo para que el grupo tenga gastos
-			//grupoMock.anadirGasto(gastoMock);
-			// Posible alternativa
+			
 			ArrayList<IGasto> gastos = new ArrayList<>();
 			gastos.add(gastoMock);
-			grupoMock.setGastos(gastos);
-			// Añadimos el mock usuario al mock grupo para que el grupo no esté vacío
-			grupoMock.anadirMiembro(usuarioMock);
+			ArrayList<IUsuario> usuarios = new ArrayList<>();
+			usuarios.add(usuarioMock);
+			when(grupoMock.getUsuarios()).thenReturn(usuarios);
+			when(grupoMock.getGastos()).thenReturn(gastos);
+
 			pago1 = new Pago(1, grupoMock);
 			
 			assertAll( 
-					()->{assertNotNull(grupoMock.getGastos(), "Se crea un pago sin gastos");},
-					()->{assertNotNull(grupoMock.getUsuarios(), "Se crea un pago sin personas");},
-					()->{assertFalse(grupoMock.getGastos().isEmpty(), "Se crea un pago sin gastos");},
-					()->{assertFalse(grupoMock.getUsuarios().isEmpty(), "Se crea un pago sin personas");},
-					()->{assertNotNull(pago1.getGrupoGasto(), "Pago válido no genera pago");},
-					()->{verify(grupoMock, times(1)).anadirMiembro(usuarioMock);},
-				    ()->{verify(grupoMock, times(1)).anadirGasto(gastoMock);}); 
+					()->{assertEquals(gastos, grupoMock.getGastos(), "Se crea un pago sin gastos");},
+					()->{assertEquals(usuarios, grupoMock.getUsuarios(), "Se crea un pago sin personas");},
+					()->{assertNotNull(pago1.getGrupoGasto(), "Pago válido no genera pago");});
 		}
 		
 		
