@@ -9,12 +9,10 @@ import pago.IPago;
 
 public interface IGrupo {
 	
-	public void anadirMiembro(IUsuario nuevoUsuario);
-	public void eliminarMiembro(IUsuario usuario);
-	public void modificarDescripcion(String descripcion);
-	public void anadirGasto(IGasto gasto);
-	//public void modificarGasto(IGasto gasto);
-	public void dividirGastos();
+	public boolean anadirMiembro(IUsuario nuevoUsuario);
+	public boolean eliminarMiembro(IUsuario usuario);
+	public boolean anadirGasto(IGasto gasto);
+	public boolean dividirGastos();
 	
 	// Getters
 	public int getId();
@@ -25,6 +23,8 @@ public interface IGrupo {
 	public ArrayList<IPago> getPagos();
 	
 	// Setters
+	public void setNombreGrupo(String nombreGrupo);
+	public void setDescripcion(String descripcion);
 	public void setGastos(ArrayList<IGasto> gastos);
 	public void setUsuarios(ArrayList<IUsuario> usuarios);
 	public void setPagos(ArrayList<IPago> pagos);

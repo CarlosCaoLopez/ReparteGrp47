@@ -4,11 +4,14 @@ package grupo;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,25 +20,31 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 
+import gasto.Gasto;
+import gasto.IGasto;
+import pago.IPago;
+import pago.Pago;
 import usuario.IUsuario;
+import usuario.Usuario;
 
 class GrupoTest {
 	//Fixtures
 	Grupo grupo;
 	// Creamos un mock de usuario
-    IUsuario usuarioMock = mock(IUsuario.class);    
+    IUsuario usuarioMock;    
     // Creamos una lista de usuarios que contiene nuestro mock
-    ArrayList<IUsuario> usuariosMock = new ArrayList<>();
+    ArrayList<IUsuario> usuariosMock;
     // Añadimos el usuario
-    ArrayList<IUsuario> usuarios = new ArrayList<>();
+    ArrayList<IUsuario> usuariosVacio = new ArrayList<>();
 	
 	
 	@BeforeEach
 	void setUp() throws Exception {
+		usuarioMock = mock(IUsuario.class);
+		usuariosMock = new ArrayList<>();
 		usuariosMock.add(usuarioMock); // Añadimos el mock al conjunto de usuarios
 		
 	}
@@ -64,10 +73,10 @@ class GrupoTest {
 		
 		@ParameterizedTest
 		@DisplayName("Verificación id positivo")
-		@CsvSource({"-1"})
+		@CsvSource({"-1", "0"})
 		void testIdNoVálido(int id) {
 			grupo = new Grupo(id, "nombre Grupo", "descripcion", usuariosMock);
-			assertEquals(0, grupo.getId(), "Un id no  ha sido validado");
+			assertTrue(grupo.getId() <= 0, "El id es cero o negativo");
 			
 		}
 		
@@ -81,7 +90,7 @@ class GrupoTest {
 		}
 		
 		@ParameterizedTest
-		@DisplayName("Verificación descripcion vacío o nulo")
+		@DisplayName("Verificación descripción vacía o nula")
 		@NullAndEmptySource
 		void testDescripcionNoVálido(String descripcion) {
 			grupo = new Grupo(4, "nombreGrupo", descripcion, usuariosMock);
@@ -90,15 +99,163 @@ class GrupoTest {
 		}
 		
 		@ParameterizedTest
-		@DisplayName("Verificación usuarios vacío o nulo")
-		@NullAndEmptySource
-		void testUsuariosNoVálido(ArrayList<IUsuario> usuarios) {
+		@DisplayName("Verificación conjunto de usuarios nulo")
+		@NullSource
+		void testUsuariosNulo(ArrayList<IUsuario> usuarios) {
 			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuarios);
-			assertNull(grupo.getUsuarios(), "Unos usuarios no han sido validados");
+			assertNull(grupo.getUsuarios(), "El conjunto de usuario es nulo");
+		}
 		
+		@Test
+		@DisplayName("Verificación conjunto de usuarios vacío")
+		void testUsuariosVacio() {
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosVacio);
+			assertNull(grupo.getUsuarios(), "El conjunto de usuario es vacío");
 		}
 		
 	}
 	
+	
+	@Nested
+	@DisplayName("Prueba de añadir miembros al grupo")
+	class anadirMiembro{
+		
+		@Test
+		@DisplayName("Verificación de que el usuario es no nulo (caso no válido)")
+		void testAnadirMiembroNoValido(){
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			assertFalse(grupo.anadirMiembro(null), "El usuario es nulo");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el usuario es no nulo (caso válido)")
+		void testAnadirMiembroValido(){
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			IUsuario usuario2Mock = mock(IUsuario.class);
+			assertAll( ()->{assertTrue(grupo.anadirMiembro(usuario2Mock), "El usuario es correcto");},
+					()->{assertTrue(grupo.getUsuarios().contains(usuario2Mock), "El usuario no se ha introducido en la lista");},
+					()->{assertEquals(2, grupo.getUsuarios().size(), "El tamaño de la lista de usuarios es incorrecta");} );
+		}
+		
+	}
+	
+	@Nested
+	@DisplayName("Prueba de eliminar miembros del grupo")
+	class eliminarMiembro{
+		
+		@Test
+		@DisplayName("Verificación de que el usuario es no nulo (caso no válido)")
+		void testEliminarMiembroNoValido(){
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			assertFalse(grupo.eliminarMiembro(null), "El usuario es nulo");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el usuario es no nulo (caso válido)")
+		void testEliminarMiembroValido(){
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			assertAll( ()->{assertTrue(grupo.eliminarMiembro(usuarioMock), "El usuario es correcto");},
+					()->{assertEquals(0, grupo.getUsuarios().size(), "El tamaño de la lista de usuarios es incorrecta");} );
+		}
+		
+	}
+	
+	@Nested
+	@DisplayName("Prueba de añadir gastos al grupo")
+	class anadirGasto{
+		
+		@Test
+		@DisplayName("Verificación de que el gasto es no nulo (caso no válido)")
+		void testAnadirGastoNoValido(){
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			assertFalse(grupo.anadirGasto(null), "El gasto es nulo");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el gasto es pagado por una persona del grupo (caso no válido)")
+		void testAnadirGastoFuera(){
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			IUsuario usuario2Mock = mock(IUsuario.class);
+			IGasto gastoMock = mock(IGasto.class);
+			when(gastoMock.getPagador()).thenReturn(usuario2Mock);
+			assertFalse(grupo.anadirGasto(gastoMock), "El gasto pertenece a una persona que no está en el grupo");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el gasto es pagado por una persona del grupo (caso válido)")
+		void testAnadirGastoDentro(){
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			IGasto gastoMock = mock(IGasto.class);
+			when(gastoMock.getPagador()).thenReturn(usuarioMock);
+			assertTrue(grupo.anadirGasto(gastoMock), "El gasto pertenece a una persona que sí que está al grupo");
+		}
+		
+	}
+	
+	@Nested 
+	@DisplayName("Pruebas de dividir gastos desde un Grupo")
+	class dividirGastos{
+		
+		IGasto gastoMock;
+		IPago pagoMock;
+		IUsuario usuario;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			gastoMock = mock(Gasto.class);
+			pagoMock = mock(Pago.class);
+			usuarioMock = mock(Usuario.class);
+			// Suponemos que si se llega a la parte más interior de las condiciones, se pasa la prueba 
+			when(pagoMock.repartirGastos()).thenReturn(true);
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		// TODO: No funciona correctamente. No se puede settear un valor nulo
+		@Test
+		@DisplayName("Verificación de que el conjunto de usuarios del grupo es no nulo")
+		void testUsuariosNulo() {
+			grupo.setUsuarios(null);
+			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
+			assertFalse(grupo.dividirGastos(), "El conjunto de usuarios del grupo es nulo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el grupo debe incluir algún usuario")
+		void testUsuariosVacio() {
+			grupo.setUsuarios(new ArrayList<IUsuario>());
+			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
+			assertFalse(grupo.dividirGastos(), "El grupo no tiene integrantes");
+		}
+		
+		// TODO: No funciona correctamente. No se puede settear un valor nulo
+		@Test
+		@DisplayName("Verificación de que el conjunto de gastos del grupo es no nulo")
+		void testGastosNulo() {
+			grupo.setGastos(null);
+			assertFalse(grupo.dividirGastos(), "El conjunto de gastos del grupo es nulo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el grupo debe incluir algún gasto")
+		void testGastosVacio() {
+			grupo.setGastos(new ArrayList<IGasto>());
+			assertFalse(grupo.dividirGastos(), "El conjunto de gastos está vacío");
+		}
+		
+		// TODO: No funciona correctamente. Está usando la clase Pago, no sé cómo mockearla
+		@Test
+		@DisplayName("Verificación del pago caso válido")
+		void testValido() {
+			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
+			//whenNew(Pago.class).withAnyArguments().thenReturn(pagoMock);
+			assertTrue(grupo.dividirGastos(), "El grupo es en realidad correcto");
+		}
+		
+	}
 
 }

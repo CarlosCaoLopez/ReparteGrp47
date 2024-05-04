@@ -35,7 +35,7 @@ class GastoTest {
 			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(pagandoMock)));
 
 			IGasto gasto1=new Gasto(10,10.1,grupoMock,pagandoMock);
-			IGasto gasto2=new Gasto(10,10.1,grupoMock,pagandoMock,null);
+			IGasto gasto2=new Gasto(10,10.1,grupoMock,pagandoMock,"Negocio");
 			
 			assertAll(
 					()->{assertNotNull(gasto1.getPagador(),"Error, no se asignan las variables del constructor");},

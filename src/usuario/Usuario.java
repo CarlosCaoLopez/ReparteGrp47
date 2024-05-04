@@ -30,16 +30,19 @@ public class Usuario implements IUsuario {
 	
 	public Usuario(int id, String nombreUsuario, String nombreReal, String correoElectronico, LocalDate fechaNacimiento, String contrasena, String datosBancarios,
 			ArrayList<String> notificaciones, ArrayList<IGrupo> grupos, ArrayList<IGasto> gastos,  ArrayList<IPago> pagos) {
-		if(id > 0 && nombreUsuario != null && correoElectronico != null && fechaNacimiento != null && contrasena != null && datosBancarios != null
+		if(id > 0 && nombreUsuario != null && !nombreUsuario.isEmpty() && nombreReal != null && !nombreReal.isEmpty()
+				&& correoElectronico != null && fechaNacimiento != null && contrasena != null && datosBancarios != null
 				&& notificaciones != null && grupos != null && gastos != null && pagos != null) {
 			if(checkCorreoElectronico(correoElectronico) && checkDatosBancarios(datosBancarios) && checkContrasena(contrasena)) {
 				this.id = id;
 				this.nombreUsuario = nombreUsuario;
+				this.nombreReal = nombreReal;
 				this.correoElectronico = correoElectronico;
 				this.fechaNacimiento = fechaNacimiento;
 				this.contrasena = contrasena;
 				this.datosBancarios = datosBancarios;
 				this.notificaciones = new ArrayList<>();
+				this.notificaciones.addAll(notificaciones);
 				this.grupos = new ArrayList<>();
 				this.grupos.addAll(grupos);
 				this.gastos = new ArrayList<>();
@@ -52,10 +55,12 @@ public class Usuario implements IUsuario {
 	
 	
 	public Usuario(int id, String nombreUsuario, String nombreReal, String correoElectronico, LocalDate fechaNacimiento, String contrasena, String datosBancarios) {
-		if(nombreUsuario != null && correoElectronico != null && fechaNacimiento != null && contrasena != null && datosBancarios != null) {
+		if(id > 0 && nombreUsuario != null && !nombreUsuario.isEmpty() && nombreReal != null && !nombreReal.isEmpty()
+				&& correoElectronico != null && fechaNacimiento != null && contrasena != null && datosBancarios != null) {
 			if(checkCorreoElectronico(correoElectronico) && checkDatosBancarios(datosBancarios) && checkContrasena(contrasena)) {
 				this.id = id;
 				this.nombreUsuario = nombreUsuario;
+				this.nombreReal = nombreReal;
 				this.correoElectronico = correoElectronico;
 				this.fechaNacimiento = fechaNacimiento;
 				this.contrasena = contrasena;
@@ -148,35 +153,43 @@ public class Usuario implements IUsuario {
 
 
 	@Override
-	public void gestionarGrupo(IGrupo grupo, String descripcion, ArrayList<IUsuario> nuevosUsuarios) {
+	public boolean gestionarGrupo(IGrupo grupo, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios) {
 		
 		if(grupo != null) {
-			
-			grupo.modificarDescripcion(descripcion); // Añadimos la descripción
-			
-			for(IUsuario usr: nuevosUsuarios) { // Añadimos los usuarios
-				grupo.anadirMiembro(usr);
+			if(nombreGrupo != null && !nombreGrupo.isEmpty() && descripcion != null && !descripcion.isEmpty() && usuarios != null && usuarios.contains(this)) {
+				grupo.setNombreGrupo(nombreGrupo);
+				grupo.setDescripcion(descripcion);
+				grupo.setUsuarios(usuarios);
+				return true;
 			}
 		}
-
+		
+		return false;
 	}
 
 	
 	
 	@Override
-	public void anadirGasto(IGrupo grupo, double cantidad) {
-		IGasto gasto = new Gasto(this.id+this.gastos.size(), cantidad, grupo, this);
-		if(gasto != null) {
+	public boolean anadirGasto(IGrupo grupo, double cantidad) {
+		
+		if(grupo!=null && grupo.getUsuarios().contains(this) && cantidad>0) {
+			IGasto gasto = new Gasto(this.id+this.gastos.size(), cantidad, grupo, this);
 			this.gastos.add(gasto);
 			grupo.anadirGasto(gasto);
+			return true;
 		}
+		
+		return false;
 	}
 	
 	@Override
-	public void dividirGastos(IGrupo grupo) {
-		if(grupo != null) {
-			grupo.dividirGastos();
+	public boolean dividirGastos(IGrupo grupo) {
+		if(grupo!=null && grupo.getUsuarios()!=null && grupo.getGastos()!=null) {
+			if(!grupo.getUsuarios().isEmpty() && !grupo.getGastos().isEmpty()) {
+				return grupo.dividirGastos();
+			}
 		}
+		return false;
 	}
 	
 	
@@ -247,7 +260,7 @@ public class Usuario implements IUsuario {
 	private boolean checkCorreoElectronico(String correoElectronico) {
 		// Restricciones: el correo electrónico
 		if(!correoElectronico.isEmpty() && !correoElectronico.startsWith("@") && correoElectronico.contains("@") && (correoElectronico.chars().filter(c -> c == '@').count() == 1) 
-			&& correoElectronico.contains(".") && !correoElectronico.endsWith(".") && (correoElectronico.lastIndexOf("@")+1<correoElectronico.lastIndexOf(".") && correoElectronico.indexOf("@")+1!=correoElectronico.lastIndexOf(".")))
+			&& correoElectronico.contains(".") && !correoElectronico.endsWith(".") && correoElectronico.indexOf("@")+1!=correoElectronico.lastIndexOf("."))
 			return true;
 		
 		return false;

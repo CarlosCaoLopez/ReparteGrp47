@@ -22,7 +22,7 @@ public class Gasto implements IGasto {
 	//necesita el usuario que va a pagar el gasto
 	public Gasto(int id, double importe, IGrupo grupo, IUsuario pagando,String negocio) {
 		
-		if(id>0 && grupo!=null && pagando!=null && grupo.getUsuarios().contains(pagando) && importe>0) {
+		if(id>0 && grupo!=null && pagando!=null && grupo.getUsuarios().contains(pagando) && importe>0 && negocio!=null && !negocio.isEmpty()) {
 			this.id = id;
 			this.cantidad = importe;
 			this.grupoGasto = grupo;
@@ -100,16 +100,16 @@ public class Gasto implements IGasto {
 		return Objects.hash(id);
 	}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Gasto other = (Gasto) obj;
-			return id == other.id;
-		}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Gasto other = (Gasto) obj;
+		return id == other.id;
+	}
 
 }

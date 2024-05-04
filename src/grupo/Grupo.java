@@ -21,16 +21,15 @@ public class Grupo implements IGrupo {
 	// Constructores
 	public Grupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios) {
 		
-		if(id > 0 && nombreGrupo != null && !nombreGrupo.isEmpty() && descripcion != null && !descripcion.isEmpty() && usuarios != null) {
-			if(!usuarios.isEmpty()) {
-				this.id = id;
-				this.nombreGrupo = nombreGrupo;
-				this.descripcion = descripcion;
-				this.gastos = new ArrayList<>();
-				this.usuarios = new ArrayList<>();
-				this.usuarios.addAll(usuarios);
-				this.pagos = new ArrayList<>();		
-			}		
+		if(id > 0 && nombreGrupo != null && !nombreGrupo.isEmpty() && descripcion != null && !descripcion.isEmpty() && usuarios != null && !usuarios.isEmpty()) {
+			this.id = id;
+			this.nombreGrupo = nombreGrupo;
+			this.descripcion = descripcion;
+			this.gastos = new ArrayList<>();
+			this.usuarios = new ArrayList<>();
+			this.usuarios.addAll(usuarios);
+			this.pagos = new ArrayList<>();		
+				
 		}
 	}
 	
@@ -64,6 +63,16 @@ public class Grupo implements IGrupo {
 	
 	
 	// Métodos
+	public void setNombreGrupo(String nombreGrupo) {
+		if(nombreGrupo != null && !nombreGrupo.isEmpty()) {
+			this.nombreGrupo = nombreGrupo;
+		}
+	}
+	public void setDescripcion(String descripcion) {
+		if(descripcion != null && !descripcion.isEmpty()) {
+			this.descripcion = descripcion;
+		}
+	}
 	
 	public void setGastos(ArrayList<IGasto> gastos) {
 		if(gastos != null)
@@ -81,35 +90,32 @@ public class Grupo implements IGrupo {
 	}
 
 	@Override
-	public void anadirMiembro(IUsuario nuevoUsuario) {
+	public boolean anadirMiembro(IUsuario nuevoUsuario) {
 		
 		if(nuevoUsuario != null) {
 			this.usuarios.add(nuevoUsuario);
+			return true;
 		}
-
+		return false;
 	}
 
 	@Override
-	public void eliminarMiembro(IUsuario usuario) {
+	public boolean eliminarMiembro(IUsuario usuario) {
 		if(usuario != null) {
 			this.usuarios.remove(usuario);
+			return true;
 		}
+		return false;
 	}
 	
-	@Override
-	public void modificarDescripcion(String descripcion){
-		if(descripcion != null) {
-			this.descripcion = descripcion;
-		}
-
-	}
 
 	@Override
-	public void anadirGasto(IGasto gasto) {
-		if(gasto != null) {
+	public boolean anadirGasto(IGasto gasto) {
+		if(gasto != null && this.usuarios.contains(gasto.getPagador())) {
 			this.gastos.add(gasto);
+			return true;
 		}
-
+		return false;
 	}
 
 	/*
@@ -123,15 +129,20 @@ public class Grupo implements IGrupo {
 	 */
 
 	@Override
-	public void dividirGastos() {
-		IPago pago = new Pago(this.id+this.gastos.size(), this);
-		if(pago != null) {
-			pago.repartirGastos();
-			this.pagos.add(pago);
-			// Vaciamos la lista de gastos, pues ya se han computado en el pago
-			this.gastos.clear();
+	public boolean dividirGastos() {
+		if(this.getUsuarios()!=null && this.getGastos()!=null) {
+			if(!this.getUsuarios().isEmpty() && !this.getGastos().isEmpty()) {
+				IPago pago = new Pago(this.id+this.gastos.size(), this);
+				if(pago != null) {
+					boolean check = pago.repartirGastos();
+					this.pagos.add(pago);
+					// Vaciamos la lista de gastos, pues ya se han computado en el pago
+					this.gastos.clear();
+					return check;
+				}
+			}
 		}
-
+		return false;
 	}
 
 	

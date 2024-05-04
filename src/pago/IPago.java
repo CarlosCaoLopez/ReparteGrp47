@@ -10,7 +10,7 @@ import usuario.IUsuario;
 public interface IPago {
 	
 	
-	public void repartirGastos();
+	public boolean repartirGastos();
 	
 	
 	//getters y setters

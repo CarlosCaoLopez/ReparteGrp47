@@ -10,9 +10,9 @@ import gasto.IGasto;
 public interface IUsuario {	
 	
 	public IGrupo crearGrupo(int id, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios);
-	public void gestionarGrupo(IGrupo grupo, String descripcion, ArrayList<IUsuario> nuevosUsuarios);
-	public void anadirGasto(IGrupo grupo, double cantidad); 
-	public void dividirGastos(IGrupo grupo);
+	public boolean gestionarGrupo(IGrupo grupo, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios);
+	public boolean anadirGasto(IGrupo grupo, double cantidad); 
+	public boolean dividirGastos(IGrupo grupo);
 	public void notificar(IPago pago);
 	public IPago realizarPago(IPago pago);
 	

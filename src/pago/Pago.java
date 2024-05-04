@@ -2,6 +2,7 @@ package pago;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Random;
 
 import gasto.IGasto;
@@ -76,12 +77,12 @@ public class Pago implements IPago {
 
 
 	@Override
-	public void repartirGastos() {
+	public boolean repartirGastos() {
 		int n;
 		double sumaParcial;
 		
-		if(grupoGasto!=null && grupoGasto.getUsuarios()!=null && gastos!=null) {
-			if(!grupoGasto.getUsuarios().isEmpty() && !gastos.isEmpty()) {
+		if(grupoGasto!=null && grupoGasto.getUsuarios()!=null && grupoGasto.getGastos()!=null) {
+			if(!grupoGasto.getUsuarios().isEmpty() && !grupoGasto.getGastos().isEmpty()) {
 				for(IUsuario user : grupoGasto.getUsuarios()) {
 					// Añadimos a cada usuario una lista, donde se indicará lo que le debe a cada uno
 					cuotas.put(user, new HashMap<>()); 
@@ -89,7 +90,7 @@ public class Pago implements IPago {
 						if(!user.equals(otro)) cuotas.get(user).put(otro, 0.0);
 					}	
 				} 
-
+	
 				n = grupoGasto.getUsuarios().size(); // Número de personas sobre las que se reparte el gasto				
 				for(IGasto gasto : gastos) {
 					IUsuario pagador = gasto.getPagador(); // Separamos al pagador
@@ -110,18 +111,24 @@ public class Pago implements IPago {
 				
 				
 				for(IUsuario user : grupoGasto.getUsuarios()) {
+					// Indicamos el estado de cada pago como falso
+					pagado.put(user, false);
 					// Notificamos a cada usuario del nuevo pago pendiente
 					user.notificar(this);
 				}
-				
-				
+				return true;
 			}
+				
 		}
+		return false;
 	}
 
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 	
-	// equals de pagos (es literalmente el de usuario ya que ambos usan id)
 	@Override 
 	public boolean equals(Object obj) {
 		if (this == obj)
