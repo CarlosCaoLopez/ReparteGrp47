@@ -1,6 +1,7 @@
 package usuario;
 
 
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,6 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import gasto.Gasto;
 import gasto.IGasto;
@@ -259,23 +263,26 @@ class UsuarioTest {
 	
 	
 	@Nested 
-	@DisplayName("Pruebas de creación de grupo desde un Usuario")
-	class crearGrupo{
-
-		IGrupo grupoMock;
-		Usuario usuario3;
+	@DisplayName("Pruebas de unidad de creación de grupo desde un Usuario")
+	class crearGrupoUnidad{
+		AutoCloseable ac1;
 		ArrayList<IUsuario> usuarios;
+
+		@Mock
+		IGrupo grupoMock;
 		
+		@InjectMocks
+		Usuario usuario3 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");;
+				
 		@BeforeEach
 		void setUp() throws Exception {
-			grupoMock =mock(Grupo.class);
-			usuario3 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			ac1 = MockitoAnnotations.openMocks(this);
 			usuarios = new ArrayList<>();
 		}
 
 		@AfterEach
 		void tearDown() throws Exception {
-			
+			ac1.close();
 		}
 		
 		@ParameterizedTest
@@ -352,7 +359,117 @@ class UsuarioTest {
 		}
 	}
 	
-	
+	@Nested 
+	@DisplayName("Pruebas de integración de creación de grupo desde un Usuario")
+	class crearGrupoIntegracion{
+		IGrupo grupo;
+		IUsuario usuario3;
+		ArrayList<IUsuario> usuarios;
+				
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario3 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuarios = new ArrayList<>();
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el usuario que crea el grupo debe incluir algún usuario")
+		@NullAndEmptySource
+		void testUsuariosNulos(ArrayList<IUsuario> usuarios_) {
+			assertNull(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios_), "Usuario creador del grupo no forma parte del grupo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el usuario que crea el grupo se encuentra en [usuarios] (caso no válido)")
+		void testUsuarioFuera() {
+			IUsuario usuario4 = new Usuario(4, "nomeUsuario", "nomeReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuarios.add(usuario4);
+			assertNull(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios), "Usuario creador del grupo no forma parte del grupo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el usuario que crea el grupo se encuentra en [usuarios] (caso válido)")
+		void testUsuarioDentro() {
+			usuarios.add(usuario3);
+			assertAll(	()->{assertNotNull(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios), "Usuario creador dentro de grupo invalidado");},
+						()->{assertEquals(1, usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getId(), "Grupo creado con usuario dentro, pero id incorrecto");},
+						()->{assertEquals("nombre", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getNombreGrupo(), "Grupo creado con usuario dentro, pero  nombre incorrecto");},
+						()->{assertEquals("descripcion", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getDescripcion(), "Grupo creado con usuario dentro, pero descripción incorrecto");},
+						()->{assertTrue(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getUsuarios().contains(usuario3), "Grupo creado con usuario dentro, pero no está el usuario dentro");}
+					);
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el id es un número positivo (caso no válido)")
+		@CsvSource({"-1", "0"})
+		void testIdNoValido(int id) {
+			usuarios.add(usuario3);
+			assertNull(usuario3.crearGrupo(id, "nombreGrupo", "descripcion", usuarios), "Id introducido no válido");
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el id es un número positivo (caso válido)")
+		@CsvSource({"1"})
+		void testIdValido(int id) {
+			usuarios.add(usuario3);
+			assertNotNull(usuario3.crearGrupo(id, "nombreGrupo", "descripcion", usuarios), "Id introducido válido, se trata como no válido");
+			assertAll(	()->{assertNotNull(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios), "Id introducido válido, se trata como no válido");},
+					()->{assertEquals(1, usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getId(), "Grupo creado con id valido, tiene id incorrecto");},
+					()->{assertEquals("nombre", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getNombreGrupo(), "Grupo creado con id válido, con nombre incorrecto");},
+					()->{assertEquals("descripcion", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getDescripcion(), "Grupo creado con id válido, con descripción incorrecto");},
+					()->{assertTrue(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getUsuarios().contains(usuario3), "Grupo creado con id válido, sin el creador en sus usuarios");}
+				);
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el nombre no es nulo ni vacío (caso no válido)")
+		@NullAndEmptySource
+		void testNombreNoValido(String nombre) {
+			usuarios.add(usuario3);
+			assertNull(usuario3.crearGrupo(1, nombre, "descripcion", usuarios), "Nombre inválido introducido, se trata como válido");
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el nombre no es nulo ni vacío (caso válido)")
+		@CsvSource({"nombre"})
+		void testNombreValido(String nombre) {
+			usuarios.add(usuario3);
+			assertAll(	()->{assertNotNull(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios), "Nombre introducido válido, se trata como no válido");},
+					()->{assertEquals(1, usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getId(), "Grupo creado con nombre valido, tiene id incorrecto");},
+					()->{assertEquals("nombre", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getNombreGrupo(), "Grupo creado con nombre válido, con nombre incorrecto");},
+					()->{assertEquals("descripcion", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getDescripcion(), "Grupo creado con nombre válido, con descripción incorrecto");},
+					()->{assertTrue(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getUsuarios().contains(usuario3), "Grupo creado con nombre válido, sin el creador en sus usuarios");}
+				);
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que la descripción no es nula ni vacía (caso no válido)")
+		@NullAndEmptySource
+		void testDescripcionNoValida(String descripcion) {
+			usuarios.add(usuario3);	
+			assertAll(	()->{assertNotNull(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios), "Descripcion introducida válida, se trata como no válido");},
+					()->{assertEquals(1, usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getId(), "Grupo creado con descripcion valida, tiene id incorrecto");},
+					()->{assertEquals("nombre", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getNombreGrupo(), "Grupo creado con descripcion válida, con nombre incorrecto");},
+					()->{assertEquals("descripcion", usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getDescripcion(), "Grupo creado con descripcion válida, con descripción incorrecto");},
+					()->{assertTrue(usuario3.crearGrupo(1, "nombre", "descripcion", usuarios).getUsuarios().contains(usuario3), "Grupo creado con descripcion válida, sin el creador en sus usuarios");}
+				);
+		}		
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que la descripción no es nula ni vacía (caso válido)")
+		@CsvSource({"descripcion"})
+		void testDescripcionValida(String descripcion) {
+			ArrayList<IUsuario> usuarios = new ArrayList<IUsuario>();
+			usuarios.add(usuario3);	
+			assertNotNull(usuario3.crearGrupo(1, "nombre", descripcion, usuarios), "Descripcion válida introducida, se trata como no válida");
+
+		}
+	}
 	
 	
 	@Nested 
@@ -438,6 +555,7 @@ class UsuarioTest {
 
 		}
 	}
+	
 	
 	
 	@Nested 
