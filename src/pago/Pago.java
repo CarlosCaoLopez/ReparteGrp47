@@ -14,7 +14,7 @@ public class Pago implements IPago {
 	
 	private int id;
 	private ArrayList<IGasto> gastos;
-	private Double total;
+	private double total;
 	private HashMap<IUsuario, HashMap<IUsuario, Double>> cuotas;
 	private HashMap<IUsuario, Boolean> pagado;
 	private IGrupo grupoGasto;
