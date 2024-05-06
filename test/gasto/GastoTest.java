@@ -1,15 +1,28 @@
 package gasto;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import grupo.Grupo;
 import grupo.IGrupo;
 import usuario.IUsuario;
 import usuario.Usuario;
-
-import java.util.*;
 class GastoTest {
 
 	@BeforeEach
@@ -49,11 +62,11 @@ class GastoTest {
 			IUsuario pagandoMock = mock(Usuario.class);
 			
 			Gasto gasto1=new Gasto(10,10.1,null,pagandoMock);
-			Gasto gasto2=new Gasto(10,10.1,null,pagandoMock,null);
+			Gasto gasto2=new Gasto(10,10.1,null,pagandoMock, "Negocio");
 			
 			assertAll(
-					()->{assertNull(gasto1.getPagador(),"Error, se asignan las variables del constructor, debería fallar");},
-					()->{assertNull(gasto2.getPagador(),"Error, se asignan las variables del constructor, debería fallar");});
+					()->{assertNull(gasto1.getPagador(),"Error, el grupo es nulo");},
+					()->{assertNull(gasto2.getPagador(),"Error, el grupo es nulo");});
 
 		}
 		
@@ -63,11 +76,11 @@ class GastoTest {
 			IGrupo grupoMock =mock(Grupo.class);
 			
 			IGasto gasto1=new Gasto(10,10.1,grupoMock,null);
-			IGasto gasto2=new Gasto(10,10.1,grupoMock,null,null);
+			IGasto gasto2=new Gasto(10,10.1,grupoMock,null, "Negocio");
 			
 			assertAll(
-					()->{assertNull(gasto1.getGrupoGasto(),"Error, se asignan las variables del constructor, debería fallar");},
-					()->{assertNull(gasto2.getGrupoGasto(),"Error, se asignan las variables del constructor, debería fallar");});
+					()->{assertNull(gasto1.getGrupoGasto(),"Error, el usuario que paga es nulo");},
+					()->{assertNull(gasto2.getGrupoGasto(),"Error, el usuario que paga es nulo");});
 
 			
 		}
@@ -82,17 +95,17 @@ class GastoTest {
 
 			
 			IGasto gasto1=new Gasto(10,10.1,grupoMock,pagandoMock);
-			IGasto gasto2=new Gasto(10,10.1,grupoMock,pagandoMock,null);
+			IGasto gasto2=new Gasto(10,10.1,grupoMock,pagandoMock,"Negocio");
 			
 			assertAll(
-					()->{assertNull(gasto1.getPagador(),"Error, se asignan las variables del constructor, debería fallar");},
-					()->{assertNull(gasto2.getPagador(),"Error, se asignan las variables del constructor, debería fallar");});
+					()->{assertNull(gasto1.getPagador(),"Error, el usuario que paga no forma parte del grupo");},
+					()->{assertNull(gasto2.getPagador(),"Error, el usuario que paga no forma parte del grupo");});
 
 			
 		}
 		
 		@Test
-		@DisplayName("Chequeo con importe menoroigual a cero")
+		@DisplayName("Chequeo con importe menor o igual a cero")
 		void testimporteincorrecto() {
 			IGrupo grupoMock =mock(Grupo.class);
 			IUsuario pagandoMock = mock(Usuario.class);
@@ -104,13 +117,13 @@ class GastoTest {
 			IGasto gasto2=new Gasto(10,0,grupoMock,pagandoMock,null);
 			
 			assertAll(
-					()->{assertNull(gasto1.getPagador(),"Error, se asignan las variables del constructor, debería fallar");},
-					()->{assertNull(gasto2.getPagador(),"Error, se asignan las variables del constructor, debería fallar");});
+					()->{assertNull(gasto1.getPagador(),"Error, el importe es menor o igual que cero");},
+					()->{assertNull(gasto2.getPagador(),"Error, el importe es menor o igual que cero");});
 
 		}
 		
 		@Test
-		@DisplayName("Chequeo con id menoroigual a cero")
+		@DisplayName("Chequeo con id menor o igual a cero")
 		void testidincorrecto() {
 			IGrupo grupoMock =mock(Grupo.class);
 			IUsuario pagandoMock = mock(Usuario.class);
@@ -118,11 +131,26 @@ class GastoTest {
 			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(pagandoMock)));
 
 			Gasto gasto1=new Gasto(0,0.1,grupoMock,pagandoMock);
-			Gasto gasto2=new Gasto(0,0.1,grupoMock,pagandoMock,null);
+			Gasto gasto2=new Gasto(0,0.1,grupoMock,pagandoMock,"Negocio");
 			
 			assertAll(
-					()->{assertNull(gasto1.getPagador(),"Error, se asignan las variables del constructor, debería fallar");},
-					()->{assertNull(gasto2.getPagador(),"Error, se asignan las variables del constructor, debería fallar");});
+					()->{assertNull(gasto1.getPagador(),"Error, el id es menor o igual que cero");},
+					()->{assertNull(gasto2.getPagador(),"Error, el id es menor o igual que cero");});
+
+		}
+		
+		@ParameterizedTest
+		@NullAndEmptySource
+		@DisplayName("Chequeo con negocio nulo o vacío")
+		void testNegocio(String negocio) {
+			IGrupo grupoMock = mock(Grupo.class);
+			IUsuario pagandoMock = mock(Usuario.class);
+			
+			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(pagandoMock)));
+
+			Gasto gasto=new Gasto(10,0.1,grupoMock,pagandoMock, negocio);
+			
+			assertNull(gasto.getPagador(),"Error, el negocio es nulo o vacío");
 
 		}
 		
@@ -133,7 +161,7 @@ class GastoTest {
 	// TODO Habría que comprobar que el gasto se ha creado correctamente, porque el grupo al que está asociado
 	// no contiene al usuario (el grupo está vacío), y diría que el gasto no se está creando correctamente
     @Test
-    @DisplayName("Testeo de registrargasto")
+    @DisplayName("Testeo de registrar gasto")
     void testRegistrarGasto() {
         // Creamos un mock de la interfaz IGrupo
         IGrupo grupoMock = mock(IGrupo.class);

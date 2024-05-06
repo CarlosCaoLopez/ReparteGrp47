@@ -133,13 +133,12 @@ public class Grupo implements IGrupo {
 		if(this.getUsuarios()!=null && this.getGastos()!=null) {
 			if(!this.getUsuarios().isEmpty() && !this.getGastos().isEmpty()) {
 				IPago pago = new Pago(this.id+this.gastos.size(), this);
-				if(pago != null) {
-					boolean check = pago.repartirGastos();
-					this.pagos.add(pago);
-					// Vaciamos la lista de gastos, pues ya se han computado en el pago
-					this.gastos.clear();
-					return check;
-				}
+				boolean check = pago.repartirGastos();
+				this.pagos.add(pago);
+				// Vaciamos la lista de gastos, pues ya se han computado en el pago
+				this.gastos.clear();
+				return check;
+				
 			}
 		}
 		return false;

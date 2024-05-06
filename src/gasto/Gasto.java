@@ -45,24 +45,6 @@ public class Gasto implements IGasto {
 		
 	}
 	
-	
-	//funciones de tipo setter para cambiar el servicio, importe y pagador
-	@Override
-	public void modificarServicio(String nuevoservicio) {
-		this.servicio=nuevoservicio;
-	}
-	@Override
-	public void modificarPagador(IUsuario nuevopagador) {
-		if(nuevopagador!=null) {
-			this.pagador=nuevopagador;
-		}
-	}
-	@Override
-	public void modificarGasto(double nuevacantidad) {
-		if(nuevacantidad>0) {
-			this.cantidad=nuevacantidad;
-		}
-	}
 
 	//funcion para meter el gasto dentro de un grupo
 	@Override

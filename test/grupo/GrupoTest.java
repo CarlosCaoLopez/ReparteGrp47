@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +23,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import gasto.Gasto;
 import gasto.IGasto;
@@ -46,7 +50,6 @@ class GrupoTest {
 		usuarioMock = mock(IUsuario.class);
 		usuariosMock = new ArrayList<>();
 		usuariosMock.add(usuarioMock); // Añadimos el mock al conjunto de usuarios
-		
 	}
 
 	@AfterEach
@@ -198,28 +201,38 @@ class GrupoTest {
 		
 		IGasto gastoMock;
 		IPago pagoMock;
-		IUsuario usuario;
+		AutoCloseable acl;
+		
+		@Mock
+		IPago pagoMock_;
+		@InjectMocks
+		IGrupo grupo_ = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
 		
 		@BeforeEach
 		void setUp() throws Exception {
 			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
 			gastoMock = mock(Gasto.class);
-			pagoMock = mock(Pago.class);
 			usuarioMock = mock(Usuario.class);
+			pagoMock = mock(Pago.class);
 			// Suponemos que si se llega a la parte más interior de las condiciones, se pasa la prueba 
 			when(pagoMock.repartirGastos()).thenReturn(true);
+						
+			acl = MockitoAnnotations.openMocks(this);
+					
 		}
 
 		@AfterEach
 		void tearDown() throws Exception {
-			
+			acl.close();
 		}
 		
-		// TODO: No funciona correctamente. No se puede settear un valor nulo
 		@Test
 		@DisplayName("Verificación de que el conjunto de usuarios del grupo es no nulo")
 		void testUsuariosNulo() {
-			grupo.setUsuarios(null);
+			// Como no se puede settear un valor nulo, hay que crear un grupo con todo a null e ir usando los setter
+			grupo = new Grupo(0, "", "", null);
+			grupo.setDescripcion("descripcion");
+			grupo.setNombreGrupo("nombreGrupo");
 			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
 			assertFalse(grupo.dividirGastos(), "El conjunto de usuarios del grupo es nulo");
 		}	
@@ -232,11 +245,14 @@ class GrupoTest {
 			assertFalse(grupo.dividirGastos(), "El grupo no tiene integrantes");
 		}
 		
-		// TODO: No funciona correctamente. No se puede settear un valor nulo
 		@Test
 		@DisplayName("Verificación de que el conjunto de gastos del grupo es no nulo")
 		void testGastosNulo() {
-			grupo.setGastos(null);
+			// Como no se puede settear un valor nulo, hay que crear un grupo con todo a null e ir usando los setter
+			grupo = new Grupo(0, "", "", null);
+			grupo.setDescripcion("descripcion");
+			grupo.setNombreGrupo("nombreGrupo");
+			grupo.setUsuarios(usuariosMock);
 			assertFalse(grupo.dividirGastos(), "El conjunto de gastos del grupo es nulo");
 		}	
 		
@@ -248,12 +264,15 @@ class GrupoTest {
 		}
 		
 		// TODO: No funciona correctamente. Está usando la clase Pago, no sé cómo mockearla
+		//       Quizás haya que indicar que no se puede hacer prueba de unidad, solo de integración
 		@Test
 		@DisplayName("Verificación del pago caso válido")
 		void testValido() {
-			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
-			//whenNew(Pago.class).withAnyArguments().thenReturn(pagoMock);
-			assertTrue(grupo.dividirGastos(), "El grupo es en realidad correcto");
+			when(pagoMock_.repartirGastos()).thenReturn(true);
+			grupo_.setGastos(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
+			grupo_.setUsuarios(usuariosMock);
+			assertTrue(grupo_.dividirGastos(), "El grupo es en realidad correcto");
+			// when(usuarioMock.equals(any(Usuario.class))).thenReturn(true);
 		}
 		
 	}
