@@ -1,10 +1,6 @@
 package pago;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -104,7 +100,24 @@ class PagoTest {
 	}
 		
 		
+	//la función debe tomar los pagos de un usuario, obtener de cada pago lo que debe dar y hacer un sumatorio
+		Double sumarvalores(IUsuario user) {
+			Double resul=0.0;
+			
+			for (IPago elm : user.getPagos()) {
+				for(Double num : elm.getCuotas().get(user).values()) {
+					resul+=num;
+				}
+			}
+			
+			return resul;
+		}
 		
+		//la función chequea si para un sumatorio de pagos dado es similar a uno calculado a mano
+		boolean enrango(IUsuario user, double cantidad) {
+			Double sumatorio_guardado=sumarvalores(user);
+			return (sumatorio_guardado <= cantidad+0.01 && sumatorio_guardado >= cantidad-0.01);
+		}
 			
 			
 		@Test
@@ -134,9 +147,16 @@ class PagoTest {
 			marta.anadirGasto(loscuatro, 20.22);
 			juan.anadirGasto(loscuatro, 5.75);
 			
+			//se dividen los gastos del grupo
 			eva.dividirGastos(loscuatro);
 			
+			
 			assertAll( 
+					
+					()->{assertTrue(enrango(eva,13.86),"La cantidad de eva está mal");},
+					()->{assertTrue(enrango(luis,15.62),"La cantidad de luis está mal");},
+					()->{assertTrue(enrango(marta,17.94),"La cantidad de marta está mal");},
+					()->{assertTrue(enrango(juan,21.56),"La cantidad de juan está mal");},
 					()->{assertFalse(luis.getNotificaciones().isEmpty(), "No se notifica a luis");},
 					()->{assertFalse(marta.getNotificaciones().isEmpty(), "No se notifica a marta");},
 					()->{assertFalse(juan.getNotificaciones().isEmpty(), "No se notifica a juan");},
