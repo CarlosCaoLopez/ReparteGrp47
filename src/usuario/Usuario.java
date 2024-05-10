@@ -170,7 +170,7 @@ public class Usuario implements IUsuario {
 	
 	public boolean eliminarGrupo(IGrupo grupo) {
 		if(grupo != null && grupo.getLideres().contains(this)) {
-			
+			//FALTAAAAAAA
 		}
 		return false;
 	}
