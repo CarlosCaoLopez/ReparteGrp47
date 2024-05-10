@@ -15,6 +15,9 @@ public interface IUsuario {
 	public boolean dividirGastos(IGrupo grupo);
 	public void notificar(IPago pago);
 	public IPago realizarPago(IPago pago);
+	public boolean incorporarMiembroEnGrupo(IUsuario usuario, IGrupo grupo);
+	public boolean eliminarMiembroEnGrupo(IUsuario usuario, IGrupo grupo);
+	public boolean eliminarGrupo(IGrupo grupo);
 	
 	// Getters
 	public int getId();

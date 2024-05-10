@@ -34,6 +34,7 @@ import gasto.IGasto;
 import grupo.Grupo;
 import grupo.IGrupo;
 import pago.IPago;
+import static org.mockito.ArgumentMatchers.*;
 
 class UsuarioTest {
 	// Fixtures
@@ -277,6 +278,8 @@ class UsuarioTest {
 		@BeforeEach
 		void setUp() throws Exception {
 			ac1 = MockitoAnnotations.openMocks(this);
+			when(grupoMock.anhadirLider(any(IUsuario.class))).thenReturn(true); // Definir el comportamiento del mock 
+																				// que nos interesa para estas pruebas
 			usuarios = new ArrayList<>();
 		}
 

@@ -13,6 +13,7 @@ public interface IGrupo {
 	public boolean eliminarMiembro(IUsuario usuario);
 	public boolean anadirGasto(IGasto gasto);
 	public boolean dividirGastos();
+	public boolean anhadirLider(IUsuario usuario);
 	
 	// Getters
 	public int getId();
@@ -21,6 +22,7 @@ public interface IGrupo {
 	public ArrayList<IGasto> getGastos();
 	public ArrayList<IUsuario> getUsuarios();
 	public ArrayList<IPago> getPagos();
+	public ArrayList<IUsuario> getLideres();
 	
 	// Setters
 	public void setNombreGrupo(String nombreGrupo);

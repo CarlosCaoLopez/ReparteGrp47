@@ -16,6 +16,7 @@ public class Grupo implements IGrupo {
 	private ArrayList<IGasto> gastos;
 	private ArrayList<IUsuario> usuarios;
 	private ArrayList<IPago> pagos;
+	private ArrayList<IUsuario> lideres;
 	
 	
 	// Constructores
@@ -28,8 +29,8 @@ public class Grupo implements IGrupo {
 			this.gastos = new ArrayList<>();
 			this.usuarios = new ArrayList<>();
 			this.usuarios.addAll(usuarios);
-			this.pagos = new ArrayList<>();		
-				
+			this.pagos = new ArrayList<>();
+			this.lideres = new ArrayList<>();
 		}
 	}
 	
@@ -53,6 +54,10 @@ public class Grupo implements IGrupo {
 
 	public ArrayList<IUsuario> getUsuarios() {
 		return usuarios;
+	}
+	
+	public ArrayList<IUsuario> getLideres() {
+		return lideres;
 	}
 
 	public ArrayList<IPago> getPagos() {
@@ -117,6 +122,15 @@ public class Grupo implements IGrupo {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean anhadirLider(IUsuario usuario) {
+		if(usuario != null && this.usuarios.contains(usuario)) {
+			this.lideres.add(usuario);
+			return true;
+		}
+		return false;
+	}
 
 	/*
 	 * @Override public void modificarGasto(IGasto gasto) { if(gasto != null) {
@@ -143,8 +157,6 @@ public class Grupo implements IGrupo {
 		}
 		return false;
 	}
-
-	
 	
 
 	@Override

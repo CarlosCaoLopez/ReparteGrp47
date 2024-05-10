@@ -140,9 +140,8 @@ public class Usuario implements IUsuario {
 		if(id > 0 && nombreGrupo != null && !nombreGrupo.isEmpty() && descripcion != null && !descripcion.isEmpty() && usuarios != null && usuarios.contains(this)) {
 			// Creamos el grupo
 			IGrupo grupo = new Grupo(id, nombreGrupo, descripcion, usuarios);
-			
-			
 			this.grupos.add(grupo); // Añadimos el grupo al conjunto de grupos del usuario
+			grupo.anhadirLider(this); // Establecer como uno de los lideres del grupo al usuario creador
 			return grupo; // return del grupo creado
 		}
 		else {
@@ -150,7 +149,31 @@ public class Usuario implements IUsuario {
 		}
 
 	}
+	
+	@Override 
+	public boolean incorporarMiembroEnGrupo(IUsuario usuario, IGrupo grupo) {
+		if(grupo != null && grupo.getLideres().contains(this) && usuario != null) {
+			grupo.anadirMiembro(usuario);
+			return true;
+		}
+		return false;
+	}
 
+	@Override 
+	public boolean eliminarMiembroEnGrupo(IUsuario usuario, IGrupo grupo) {
+		if(grupo != null && grupo.getLideres().contains(this) && usuario != null) {
+			grupo.eliminarMiembro(usuario);
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean eliminarGrupo(IGrupo grupo) {
+		if(grupo != null && grupo.getLideres().contains(this)) {
+			
+		}
+		return false;
+	}
 
 	@Override
 	public boolean gestionarGrupo(IGrupo grupo, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios) {

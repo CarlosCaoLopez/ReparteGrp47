@@ -118,6 +118,32 @@ class GrupoTest {
 		
 	}
 	
+	@Nested 
+	@DisplayName("Prueba de añadir lideres al grupo")
+	class anhadirLider{
+		
+		@Test 
+		@DisplayName("Verificación de que el lider a añadir es no nulo")
+		void testAnhadirLiderNoValido() {
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			assertFalse(grupo.anhadirLider(null), "Usuario nulo introducido tomado como usuario validado");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el lider a añadir se encuentra en el grupo (caso inválido)")
+		void testAnhadirLiderNoValido2() {
+			IUsuario usuario2Mock = mock(IUsuario.class);
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			assertFalse(grupo.anhadirLider(usuario2Mock), "Usuario fuera del grupo añadido como lider");
+		}
+		
+		@Test
+		@DisplayName("Verificacion de que el lider a añadir se encuentra en el grupo (caso válido)")
+		void testAnhadirLiderValido() {
+			grupo = new Grupo(4, "nombreGrupo", "descripcion", usuariosMock);
+			assertTrue(grupo.anhadirLider(usuarioMock), "Usuario dentro del grupo NO añadido como lider");
+		}
+	}
 	
 	@Nested
 	@DisplayName("Prueba de añadir miembros al grupo")
