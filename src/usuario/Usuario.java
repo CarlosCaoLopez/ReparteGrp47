@@ -236,20 +236,20 @@ public class Usuario implements IUsuario {
 	}
 
 	@Override
-	public IPago realizarPago(IPago pago) {
-//		
-//		if(gasto != null) {
-//			
-//			IPago pago = new Pago(); // Creamos el pago FALTAAAA!!!!!!!!!!
-//			this.gastos.remove(gasto); // Eliminamos el gasto
-//			this.pagos.add(pago); // Añadimos el pago
-//			
-//			return pago;
-//		}
-//		
-//			
-//		
-		return null;
+	public boolean realizarPago(IPago pago) {
+		
+		// Se necesita un pago añadido al usuario por un grupo al que pertenezca, y que tenga algún pago pendiente por pagar
+		if(pago!=null && this.getPagos().contains(pago) && pago.getGrupoGasto()!=null && pago.getGrupoGasto().getUsuarios()!=null && pago.getGrupoGasto().getUsuarios().contains(this) 
+				&& pago.getCuotas()!=null && pago.getCuotas().get(this)!=null && pago.getPagado()!=null && pago.getPagado().get(this)!=null && pago.getPagado().get(this)==false) {
+			pago.getPagado().replace(this, true);
+			int posicion = this.getPagos().indexOf(pago);
+			String nuevaNotificacion = this.getNotificaciones().get(posicion);
+			nuevaNotificacion.replace("Pago pendiente de", "Se ha pagado");
+			this.getNotificaciones().set(posicion, nuevaNotificacion);
+			return true;
+		}
+		
+		return false;
 	}
 
 

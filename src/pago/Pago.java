@@ -58,6 +58,10 @@ public class Pago implements IPago {
 	public IGrupo getGrupoGasto() {
 		return grupoGasto;
 	}
+	@Override
+	public HashMap<IUsuario, Boolean> getPagado() {
+		return pagado;
+	}
 	
 	@Override
 	public void setTotal(Double total) {
