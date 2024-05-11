@@ -169,8 +169,9 @@ public class Usuario implements IUsuario {
 	}
 	
 	public boolean eliminarGrupo(IGrupo grupo) {
-		if(grupo != null && grupo.getLideres().contains(this)) {
-			//FALTAAAAAAA
+		if(grupo.getLideres().contains(this) && this.dividirGastos(grupo)) { // Dividir los gastos antes de eliminar el grupo
+			grupo = null;  // Eliminar el grupo
+			return true;
 		}
 		return false;
 	}
