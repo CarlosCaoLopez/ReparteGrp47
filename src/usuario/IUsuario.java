@@ -13,7 +13,7 @@ public interface IUsuario {
 	public boolean gestionarGrupo(IGrupo grupo, String nombreGrupo, String descripcion, ArrayList<IUsuario> usuarios);
 	public boolean anadirGasto(IGrupo grupo, double cantidad); 
 	public boolean dividirGastos(IGrupo grupo);
-	public void notificar(IPago pago);
+	public boolean notificar(IPago pago);
 	public boolean realizarPago(IPago pago);
 	public boolean incorporarMiembroEnGrupo(IUsuario usuario, IGrupo grupo);
 	public boolean eliminarMiembroEnGrupo(IUsuario usuario, IGrupo grupo);

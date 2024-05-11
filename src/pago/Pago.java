@@ -69,12 +69,14 @@ public class Pago implements IPago {
 	}
 	@Override
 	public void setCuotas(HashMap<IUsuario, HashMap<IUsuario, Double>> cuotas) {
-		this.cuotas = cuotas;
+		if(cuotas != null)
+			this.cuotas = cuotas;
 	}
 	
 	@Override
 	public void setGrupoGasto(IGrupo grupoGasto) {
-		this.grupoGasto = grupoGasto;
+		if(grupoGasto != null)
+			this.grupoGasto = grupoGasto;
 	}
 
 

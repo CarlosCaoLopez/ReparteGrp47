@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,8 @@ import gasto.IGasto;
 import grupo.Grupo;
 import grupo.IGrupo;
 import pago.IPago;
+import pago.Pago;
+
 import static org.mockito.ArgumentMatchers.*;
 
 class UsuarioTest {
@@ -696,4 +699,206 @@ class UsuarioTest {
 		}
 		
 	}
+	
+	@Nested 
+	@DisplayName("Pruebas de unidad de notificar")
+	class notificar{
+		IPago pagoMock;
+		IGrupo grupoMock;
+		HashMap<IUsuario, Double> misPagos;
+		HashMap<IUsuario, HashMap<IUsuario, Double>> cuotas;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario1 = new Usuario(1, "nombreUsuario1", "nombreReal1", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
+			usuario2 = new Usuario(2, "nombreUsuario2", "nombreReal2", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
+			misPagos = new HashMap<>();
+			misPagos.put(usuario2, 20.5);
+			
+			cuotas = new HashMap<>();
+			cuotas.put(usuario1, misPagos);
+			
+			pagoMock = mock(IPago.class);
+			grupoMock = mock(IGrupo.class);
+			when(pagoMock.getCuotas()).thenReturn(cuotas);
+			when(pagoMock.getGrupoGasto()).thenReturn(grupoMock);
+			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(usuario1, usuario2)));
+
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		// No hay más casos no válidos ya que ninguna de las comprobaciones se realiza sobre la clase Usuario, sino sobre las auxiliares
+		@Test
+		@DisplayName("Notificación caso no válido")
+		void testNotificacionNoValido() {
+			assertFalse(usuario1.notificar(null), "Se ha notificado una notificación incorrecta");
+		}
+		
+		@Test
+		@DisplayName("Notificación caso válido")
+		void testNotificacionValido() {
+			assertAll( ()->{assertTrue(usuario1.notificar(pagoMock), "No se ha notificado una notificación correcta");},
+					()->{assertEquals("Pago pendiente de 20.5 a nombreReal2\n\n", usuario1.getNotificaciones().get(0), "La notificación no es igual a la correcta");});
+		}
+	}
+	
+	@Nested 
+	@DisplayName("Pruebas de integración de notificar")
+	class notificarIntegracion{
+		IPago pago;
+		IGrupo grupo;
+		HashMap<IUsuario, Double> misPagos;
+		HashMap<IUsuario, HashMap<IUsuario, Double>> cuotas;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario1 = new Usuario(1, "nombreUsuario1", "nombreReal1", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
+			usuario2 = new Usuario(2, "nombreUsuario2", "nombreReal2", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
+			
+			
+			grupo = new Grupo(1, "nombreGrupo", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario1, usuario2)));
+			grupo.anadirGasto(new Gasto(1, 20.5, grupo, usuario2));
+			
+			pago = new Pago(1, grupo);
+			
+			misPagos = new HashMap<>();
+			misPagos.put(usuario2, 20.5);
+			cuotas = new HashMap<>();
+			cuotas.put(usuario1, misPagos);
+			pago.setCuotas(cuotas);
+
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		@Test
+		@DisplayName("Notificación caso válido")
+		void testNotificacionValido() {
+			assertAll( ()->{assertTrue(usuario1.notificar(pago), "No se ha notificado una notificación correcta");},
+					()->{assertEquals("Pago pendiente de 20.5 a nombreReal2\n\n", usuario1.getNotificaciones().get(0), "La notificación no es igual a la correcta");});
+		}
+		
+		@Test
+		@DisplayName("Notificación pago nulo")
+		void testPagoNulo() {
+			assertFalse(usuario1.notificar(null), "El pago es nulo");
+		}
+		
+		@Test
+		@DisplayName("Notificación grupo nulo")
+		void testGrupoNulo() {
+			pago = new Pago(1, null); //Para poner el grupo a nulo, hay que inicializar incorrectamente el pago
+			
+			assertFalse(usuario1.notificar(pago), "El grupo es nulo");
+		}
+		
+		@Test
+		@DisplayName("Notificación conjunto de usuarios nulo")
+		void testUsuarioNulo() {
+			grupo = new Grupo(1, null, null, null); //Para poner a nulo, hay que inicializar incorrectamente el grupo
+			pago.setGrupoGasto(grupo);
+			
+			assertFalse(usuario1.notificar(pago), "El conjunto de usuarios es nulo");
+		}
+		
+		@Test
+		@DisplayName("Notificación el usuario se encuentra fuera del grupo")
+		void testUsuarioFuera() {
+			grupo.getUsuarios().remove(usuario1);
+			pago.setGrupoGasto(grupo);
+			
+			assertFalse(usuario1.notificar(pago), "El usuario se encuentra fuera del grupo");
+		}
+		
+		@Test
+		@DisplayName("Notificación cuotas del pago nulo")
+		void testCuotasNulo() {
+			pago = new Pago(1, null); //Para poner las cuotas a nulo, hay que inicializar incorrectamente el pago
+			pago.setGrupoGasto(grupo);
+			
+			assertFalse(usuario1.notificar(pago), "Las cuotas del pago es nulo");
+		}
+		
+		@Test
+		@DisplayName("Notificación cuotas del pago no contienen al usuario")
+		void testCuotasFuera() {
+			misPagos = new HashMap<>();
+			misPagos.put(usuario1, 20.5);
+			cuotas = new HashMap<>();
+			cuotas.put(usuario2, misPagos);
+			pago.setCuotas(cuotas);
+			
+			assertFalse(usuario1.notificar(pago), "Las cuotas del pago no contienen al usuario");
+		}
+		
+		
+	}
+	
+	@Nested 
+	@DisplayName("Pruebas de unidad de realizar pago")
+	class realizarPago{
+		IPago pagoMock;
+		IGasto gastoMock;
+		IGrupo grupoMock;
+		HashMap<IUsuario, Double> misPagos;
+		HashMap<IUsuario, HashMap<IUsuario, Double>> cuotas;
+		HashMap<IUsuario, Boolean> pagado;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario1 = new Usuario(1, "nombreUsuario1", "nombreReal1", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
+			usuario2 = new Usuario(2, "nombreUsuario2", "nombreReal2", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
+			misPagos = new HashMap<>();
+			misPagos.put(usuario2, 20.5);
+			
+			cuotas = new HashMap<>();
+			cuotas.put(usuario1, misPagos);
+			
+			pagado = new HashMap<>();
+			pagado.put(usuario1, false);
+			pagado.put(usuario2, false);
+			
+			pagoMock = mock(IPago.class);
+			gastoMock = mock(IGasto.class);
+			grupoMock = mock(IGrupo.class);
+			usuario1.getPagos().add(pagoMock);
+			usuario1.getNotificaciones().add("Pago pendiente de 20.5 a nombreReal2\n\n");
+			
+			when(pagoMock.getCuotas()).thenReturn(cuotas);
+			when(pagoMock.getPagado()).thenReturn(pagado);
+			when(pagoMock.getGrupoGasto()).thenReturn(grupoMock);
+			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(usuario1, usuario2)));
+
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		// No hay más casos no válidos ya que las otras comprobaciones no se realizan sobre la clase Usuario, sino sobre las auxiliares
+		@Test
+		@DisplayName("Realizar pago caso no válido")
+		void testPagoNoValido() {
+			usuario1.getPagos().clear();
+			assertFalse(usuario1.realizarPago(pagoMock), "El pago no se encuentra en los pagos del usuario");
+		}
+		
+		// TODO: no se reemplaza correctamente la notificación
+		@Test
+		@DisplayName("Realizar pago caso válido")
+		void testPagoValido() {
+			assertAll( ()->{assertTrue(usuario1.realizarPago(pagoMock), "No se ha notificado una notificación correcta");},
+					()->{assertEquals("Se ha pagado 20.5 a nombreReal2\n\n", usuario1.getNotificaciones().get(0), "La notificación no es igual a la correcta");});
+		}
+	}
+	
+	
 }

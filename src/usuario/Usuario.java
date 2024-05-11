@@ -217,13 +217,12 @@ public class Usuario implements IUsuario {
 	
 	
 	@Override
-	public void notificar(IPago pago) {
+	public boolean notificar(IPago pago) {
 		
-		if(pago != null) {
+		if(pago != null && pago.getGrupoGasto()!=null && pago.getGrupoGasto().getUsuarios()!=null && pago.getGrupoGasto().getUsuarios().contains(this)
+				&& pago.getCuotas()!=null && pago.getCuotas().get(this)!=null) {
 			this.pagos.add(pago);
 			String notificacion = "";
-			
-			// TODO Añadir la notificación de lo que le debe a cada persona
 
 			HashMap<IUsuario, Double> misPagos = pago.getCuotas().get(this);
 			for(IUsuario user : misPagos.keySet()) {
@@ -231,8 +230,10 @@ public class Usuario implements IUsuario {
  			}
 			notificacion += "\n";
 			this.notificaciones.add(notificacion);
+			return true;
 		}
 		
+		return false;
 	}
 
 	@Override
