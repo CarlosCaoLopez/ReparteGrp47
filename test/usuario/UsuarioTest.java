@@ -847,7 +847,6 @@ class UsuarioTest {
 		IPago pagoMock;
 		IGasto gastoMock;
 		IGrupo grupoMock;
-		HashMap<IUsuario, Double> misPagos;
 		HashMap<IUsuario, HashMap<IUsuario, Double>> cuotas;
 		HashMap<IUsuario, Boolean> pagado;
 		
@@ -855,11 +854,12 @@ class UsuarioTest {
 		void setUp() throws Exception {
 			usuario1 = new Usuario(1, "nombreUsuario1", "nombreReal1", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
 			usuario2 = new Usuario(2, "nombreUsuario2", "nombreReal2", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
-			misPagos = new HashMap<>();
-			misPagos.put(usuario2, 20.5);
 			
 			cuotas = new HashMap<>();
-			cuotas.put(usuario1, misPagos);
+			cuotas.put(usuario1, new HashMap<>());
+			cuotas.put(usuario2, new HashMap<>());
+			cuotas.get(usuario1).put(usuario2, 20.5);
+			cuotas.get(usuario2).put(usuario1, 0.0);
 			
 			pagado = new HashMap<>();
 			pagado.put(usuario1, false);
@@ -891,13 +891,164 @@ class UsuarioTest {
 			assertFalse(usuario1.realizarPago(pagoMock), "El pago no se encuentra en los pagos del usuario");
 		}
 		
-		// TODO: no se reemplaza correctamente la notificación
 		@Test
 		@DisplayName("Realizar pago caso válido")
 		void testPagoValido() {
 			assertAll( ()->{assertTrue(usuario1.realizarPago(pagoMock), "No se ha notificado una notificación correcta");},
 					()->{assertEquals("Se ha pagado 20.5 a nombreReal2\n\n", usuario1.getNotificaciones().get(0), "La notificación no es igual a la correcta");});
 		}
+	}
+	
+	@Nested 
+	@DisplayName("Pruebas de integración de realizar pago")
+	class realizarPagoIntegración{
+		IPago pago;
+		IGasto gasto;
+		IGrupo grupo;
+		HashMap<IUsuario, HashMap<IUsuario, Double>> cuotas;
+		HashMap<IUsuario, Boolean> pagado;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario1 = new Usuario(1, "nombreUsuario1", "nombreReal1", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
+			usuario2 = new Usuario(2, "nombreUsuario2", "nombreReal2", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Contrasena!", "ES0000000000000000000000");
+			grupo = new Grupo(1, "nombreGrupo", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario1, usuario2)));
+			gasto = new Gasto(1, 20.5, grupo, usuario2);
+			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+			pago = new Pago(1, grupo);
+					
+			cuotas = new HashMap<>();
+			cuotas.put(usuario1, new HashMap<>());
+			cuotas.put(usuario2, new HashMap<>());
+			cuotas.get(usuario1).put(usuario2, 20.5);
+			cuotas.get(usuario2).put(usuario1, 0.0);
+			
+			pagado = new HashMap<>();
+			pagado.put(usuario1, false);
+			pagado.put(usuario2, false);
+			
+			usuario1.getPagos().add(pago);
+			usuario1.getNotificaciones().add("Pago pendiente de 20.5 a nombreReal2\n\n");
+			pago.setCuotas(cuotas);
+			pago.setPagado(pagado);
+			pago.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		@Test
+		@DisplayName("Realizar pago caso válido")
+		void testPagoValido() {
+			assertAll( ()->{assertTrue(usuario1.realizarPago(pago), "No se ha notificado una notificación correcta");},
+					()->{assertEquals("Se ha pagado 20.5 a nombreReal2\n\n", usuario1.getNotificaciones().get(0), "La notificación no es igual a la correcta");},
+					()->{assertTrue(pago.getPagado().get(usuario1), "Aparece que el usuario aún no ha pagado");});
+		}
+		
+		@Test
+		@DisplayName("Realizar pago nulo")
+		void testPagoNulo() {
+			assertFalse(usuario1.realizarPago(null), "El pago es nulo");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago sin pagos asignados al usuario")
+		void testPagoNoAsignado() {
+			usuario1.getPagos().clear();
+			assertFalse(usuario1.realizarPago(pago), "El usuario no tiene pagos asignados");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago con un grupo nulo")
+		void testPagoGrupoNulo() {
+			// Para poder poner el grupo a null, hay que crear el pago de forma incorrecta, y añadirle los otros valores después 
+			usuario1.getPagos().clear();
+			pago = new Pago(0, null);
+			pago.setCuotas(cuotas);
+			pago.setPagado(pagado);
+			//pago.setGrupoGasto(grupo);
+			pago.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+			usuario1.getPagos().add(pago);
+			
+			assertFalse(usuario1.realizarPago(pago), "El pago tiene el grupo nulo");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago con un grupo con un conjunto de usuario nulo")
+		void testPagoUsuariosNulo() {
+			// Para poner el conjunto de usuario a nulo, hay que crear el grupo de forma incorrecta
+			grupo = new Grupo(0, null, null, null);
+			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+			pago.setGrupoGasto(grupo);
+
+			assertFalse(usuario1.realizarPago(pago), "El grupo tiene un conjunto de usuario nulo");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago con un grupo que no contiene al usuario")
+		void testPagoUsuarioFuera() {
+			grupo.setUsuarios(new ArrayList<IUsuario>(Arrays.asList(usuario2)));
+			pago.setGrupoGasto(grupo);
+
+			assertFalse(usuario1.realizarPago(pago), "El usuario no pertenece al grupo");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago con cuotas a nulo")
+		void testPagoCuotasNulo() {
+			// Para poder poner las cuotas a null, hay que crear el pago de forma incorrecta, y añadirle los otros valores después 
+			usuario1.getPagos().clear();
+			pago = new Pago(0, null);
+			//pago.setCuotas(cuotas);
+			pago.setPagado(pagado);
+			pago.setGrupoGasto(grupo);
+			pago.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+			usuario1.getPagos().add(pago);
+
+			assertFalse(usuario1.realizarPago(pago), "Las cuotas del grupo son nulas");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago con ninguna cuota asignada al usuario")
+		void testPagoCuotaFuera() {
+			pago.getCuotas().remove(usuario1);
+
+			assertFalse(usuario1.realizarPago(pago), "No hay ninguna cuota asignada al usuario");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago con el array de Pagado nulo")
+		void testPagoPagadoNulo() {
+			// Para poder poner pagado a null, hay que crear el pago de forma incorrecta, y añadirle los otros valores después 
+			usuario1.getPagos().clear();
+			pago = new Pago(0, null);
+			pago.setCuotas(cuotas);
+			//pago.setPagado(pagado);
+			pago.setGrupoGasto(grupo);
+			pago.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+			usuario1.getPagos().add(pago);
+
+			assertFalse(usuario1.realizarPago(pago), "El array de pagado es nulo");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago sin que el array de Pagado incluya al usuario")
+		void testPagoPagadoFuera() {
+			pago.getPagado().remove(usuario1);
+
+			assertFalse(usuario1.realizarPago(pago), "El array de pagado no incluye al usuario");
+		}
+		
+		@Test
+		@DisplayName("Realizar pago de un importe ya pagado")
+		void testPagoPagadoPreviamente() {
+			pago.getPagado().put(usuario1, true);
+
+			assertFalse(usuario1.realizarPago(pago), "El usuario ya realizó el pago previamente");
+		}
+		
 	}
 	
 	

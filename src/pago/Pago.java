@@ -78,6 +78,18 @@ public class Pago implements IPago {
 		if(grupoGasto != null)
 			this.grupoGasto = grupoGasto;
 	}
+	
+	@Override
+	public void setPagado(HashMap<IUsuario, Boolean> pagado) {
+		if(pagado != null)
+			this.pagado = pagado;
+	}
+	
+	@Override
+	public void setGastos(ArrayList<IGasto> gastos) {
+		if(gastos != null)
+			this.gastos = gastos;
+	}
 
 
 

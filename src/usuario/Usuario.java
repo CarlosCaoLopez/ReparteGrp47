@@ -246,7 +246,7 @@ public class Usuario implements IUsuario {
 			pago.getPagado().replace(this, true);
 			int posicion = this.getPagos().indexOf(pago);
 			String nuevaNotificacion = this.getNotificaciones().get(posicion);
-			nuevaNotificacion.replace("Pago pendiente de", "Se ha pagado");
+			nuevaNotificacion = nuevaNotificacion.replace("Pago pendiente de", "Se ha pagado");
 			this.getNotificaciones().set(posicion, nuevaNotificacion);
 			return true;
 		}

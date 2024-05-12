@@ -23,5 +23,7 @@ public interface IPago {
 	public void setTotal(Double total);
 	public void setCuotas(HashMap<IUsuario, HashMap<IUsuario, Double>> cuotas);
 	public void setGrupoGasto(IGrupo grupoGasto);
+	public void setPagado(HashMap<IUsuario, Boolean> pagado);
+	public void setGastos(ArrayList<IGasto> gastos);
 	
 }
