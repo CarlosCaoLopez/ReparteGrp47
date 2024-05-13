@@ -721,6 +721,7 @@ class UsuarioTest {
 		@Test
 		@DisplayName("Verificación grupo sin gastos (no se pueden dividir gastos)")
 		void testGrupoSinGastos() {
+			grupo.anhadirLider(usuario);
 			grupo.getGastos().clear();
 			
 			assertFalse(usuario.eliminarGrupo(grupo), "Grupo sin gastos validado");
