@@ -1,14 +1,12 @@
 package gasto;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -163,7 +161,6 @@ class GastoTest {
 	}
 	
 	
-	//TODO unidad no terminadas
 	@Nested
 	@DisplayName("Pruebas de unidad de registrarGasto")
 	class UnidadRegistrarGasto{
@@ -183,6 +180,9 @@ class GastoTest {
 			usermock2= mock(IUsuario.class);
 			grupomock= mock(IGrupo.class);
 			
+			when(grupomock.anadirGasto(any(IGasto.class))).thenReturn(true);
+		
+			
 			//generamos un gasto válido con el user1 como pagador
 			gasto = new Gasto(99, 99.9, grupomock, usermock1);
 
@@ -193,17 +193,34 @@ class GastoTest {
 		    @DisplayName("Testeo válido de registrar gasto")
 		    void testRegistrarGasto_valido() {
 		       
-		    	assertTrue(gasto.registrarGasto(grupomock).equals(gasto), "Error, no se nos devuelve this desde el método interno, de haber funcionado tendríamos que recibirlo");
+		    	assertTrue(gasto.registrarGasto(grupomock), "Error, no se nos true cuando se ha pasado un grupo válido");
 			
 		    }
 		  
 		  @Test
 		    @DisplayName("Testeo no válido de registrar gasto (introducimos null)")
 		    void testRegistrarGasto_null() {
-		        
-		    	assertTrue(gasto.registrarGasto(null)==null, "Error, deberíamos recibir null en caso de que la condición interna se rechace. No es así");
+		        // Si le paso un grupo nulo, comprobamos que no se haya añadido al grupo
+		    	assertFalse(gasto.registrarGasto(null), "Error, deberíamos recibir false si pasamos un grupo nulo. No es así");
 			
 		    }
+		  
+		  @Test
+		  @DisplayName("Testeo no válido de registrar gasto (grupo existe y no contiene al pagador)")
+		   void testRegistrarGasto_sinpagador() {
+		        
+		    	ArrayList<IUsuario> listausers2=new ArrayList<IUsuario>();
+		    	listausers2.add(usermock2);
+		    	IGrupo grupo2 = new Grupo(99, "grupo2", "descripcion", listausers2);
+		    	
+		    	gasto.registrarGasto(grupo2);
+		    	
+		    	assertAll( ()->{assertFalse(grupo2.getGastos().contains(gasto), "Error, el grupo de gasto contiene el gasto generado cuando no debería");},
+						()->{assertFalse(grupo2.getUsuarios().contains(gasto.getPagador()), "Error, el pagador está en el grupo");} 
+						);
+			
+		    }
+		  
 		  
 		  //el resto de chequeos se realizan en grupo.anadirgasto(), esta función revisa si se cumple o no la condición de null para su ejecución.
 		
@@ -256,10 +273,8 @@ class GastoTest {
 	    @Test
 	    @DisplayName("Testeo no válido de registrar gasto (grupo nulo)")
 	    void testRegistrarGasto_gruponulo() {
-	        
-	    	gasto.registrarGasto(null);
 	    	
-	    	assertAll( ()->{assertTrue(gasto.registrarGasto(null)==null, "Error, el grupo de gasto contiene el gasto generado cuando no debería");});
+	    	assertFalse(gasto.registrarGasto(null), "Error, deberíamos recibir false si pasamos un grupo nulo. No es así");
 		
 	    }
 	    

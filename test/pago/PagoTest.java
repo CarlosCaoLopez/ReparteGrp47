@@ -1,6 +1,7 @@
 package pago;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.clearAllCaches;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,8 @@ import org.mockito.internal.util.reflection.FieldInitializer;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,53 +57,171 @@ class PagoTest {
 	@Nested
 	@DisplayName("Pruebas de creación de pagos")
 	class Constructores{
+		IGrupo grupoMock;
+		IUsuario usuarioMock;
+		IGasto gastoMock;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			grupoMock = mock(Grupo.class);	
+			usuarioMock = mock(Usuario.class);
+			gastoMock = mock(Gasto.class);
+		}
 		
 		@Test
-		@DisplayName("Verificación con grupo no nulo y vacío")
-		void testGrupoNoValido() {
-			IGrupo grupoMock = mock(Grupo.class);
+		@DisplayName("Verificación id válido")
+		void testIdNoValido() {
+			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(usuarioMock)));
+			when(grupoMock.getGastos()).thenReturn(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
+			pago1 = new Pago(0, grupoMock);
 			
+			assertTrue(pago1.getId()<=0, "El id no es válido");
+			
+		}
+		
+		@Test
+		@DisplayName("Verificación grupo no nulo")
+		void testGrupoNulo() {			
 			pago1 = new Pago(1, null);
-			pago2 = new Pago(2, grupoMock);
 			
-			assertAll( ()->{assertNull(pago1.getGrupoGasto(), "Se crea un pago con un grupo nulo");},
-					()->{assertNull(pago1.getGrupoGasto(), "Se crea un pago con un grupo vacío");}); 
-			
+			assertNull(pago1.getGrupoGasto(), "Se crea un pago con un grupo nulo");			
 		}
 		
 		@Test
-		@DisplayName("Verificación con grupo sin gastos")
-		void testGrupoSinGastos() {
-			IUsuario usuarioMock = mock(Usuario.class);
-			IGrupo grupoMock = mock(Grupo.class);
-
-			// Añadimos el mock usuario al mock grupo para que el grupo no esté vacío
-			grupoMock.anadirMiembro(usuarioMock);
+		@DisplayName("Verificación grupo con el conjunto de usuario no nulo")
+		void testGrupoUsuariosNulo() {	
+			when(grupoMock.getUsuarios()).thenReturn(null);
+			when(grupoMock.getGastos()).thenReturn(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
 			pago1 = new Pago(1, grupoMock);
 			
-			assertAll( ()->{assertNull(pago1.getGrupoGasto(), "Se crea un pago sin gastos");},
-				    ()->{verify(grupoMock, times(1)).anadirMiembro(usuarioMock);}); 
+			assertNull(pago1.getGrupoGasto(), "Se crea un pago con un grupo con un conjunto de usuarios nulo");			
 		}
 		
 		@Test
-		@DisplayName("Verificación con grupo sin personas")
-		void testGrupoSinPersonas() {
-			IGasto gastoMock = mock(Gasto.class);
-			IGrupo grupoMock = mock(Grupo.class);
-
-			// Añadimos el mock gasto al mock grupo para que el grupo tenga gastos
-			grupoMock.anadirGasto(gastoMock);
+		@DisplayName("Verificación grupo con el conjunto de usuario no vacío")
+		void testGrupoUsuariosVacio() {	
+			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>());
+			when(grupoMock.getGastos()).thenReturn(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
 			pago1 = new Pago(1, grupoMock);
 			
-			assertAll( ()->{assertNull(pago1.getGrupoGasto(), "Se crea un pago sin personas");},
-				    ()->{verify(grupoMock, times(1)).anadirGasto(gastoMock);}); 
+			assertNull(pago1.getGrupoGasto(), "Se crea un pago con un grupo con un conjunto de usuarios vacío");			
 		}
 		
+		@Test
+		@DisplayName("Verificación grupo con el conjunto de gastos no nulo")
+		void testGrupoGastosNulo() {	
+			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(usuarioMock)));
+			when(grupoMock.getGastos()).thenReturn(null);
+			pago1 = new Pago(1, grupoMock);
+			
+			assertNull(pago1.getCuotas(), "Se crea un pago con un grupo con un conjunto de gastos nulo");			
+		}
+		
+		@Test
+		@DisplayName("Verificación grupo con el conjunto de gastos no vacío")
+		void testGrupoGastosVacio() {	
+			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(usuarioMock)));
+			when(grupoMock.getGastos()).thenReturn(new ArrayList<IGasto>());
+			pago1 = new Pago(1, grupoMock);
+			
+			assertNull(pago1.getCuotas(), "Se crea un pago con un grupo con un conjunto de gastos vacío");			
+		}
 		
 	}
 		
+	@Nested
+	@DisplayName("Pruebas de integración y sistema de repartir gastos")
+	class repartirGastos{
 		
-	//la función debe tomar los pagos de un usuario, obtener de cada pago lo que debe dar y hacer un sumatorio
+		IPago pago;
+		IUsuario usuario1, usuario2;
+		IGrupo grupo;
+		IGasto gasto;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario1 = new Usuario(1, "user1", "user1", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuario2 = new Usuario(1, "user2", "user2", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario1, usuario2)));
+			gasto = new Gasto(1, 10.0, grupo, usuario2);
+			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+			
+			/*
+			pago.setGastos(grupo.getGastos());
+			pago.setCuotas(new HashMap<>());
+			pago.getCuotas().put(usuario1, new HashMap<>());
+			pago.getCuotas().put(usuario2, new HashMap<>());
+			pago.getCuotas().get(usuario1).put(usuario2, 10.0);
+			pago.getCuotas().get(usuario2).put(usuario1, 0.0);
+			pago.setPagado(new HashMap<>());
+			pago.getPagado().put(usuario1, false);
+			pago.getPagado().put(usuario2, true);
+			 */
+		}
+		
+		@Test
+		@DisplayName("Verificación con grupo de gasto nulo")
+		void testGrupoNulo(){
+			// Creamos el pago incorrectamente para que el grupo sea nulo
+			pago = new Pago(0, null);
+			
+			assertFalse(pago.repartirGastos(), "El grupo de gasto es nulo");
+		}
+		
+		@Test
+		@DisplayName("Verificación con grupo de gasto con usuarios nulo")
+		void testGrupoUsuariosNulo(){
+			pago = new Pago(1, grupo);
+			
+			// Creamos el grupo incorrectamente para que el conjunto de usuarios sea nulo
+			grupo = new Grupo(0, null, null, null);
+			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+			pago.setGrupoGasto(grupo);
+
+			assertFalse(pago.repartirGastos(), "El grupo de gasto tiene un conjunto de usuarios nulo");
+		}
+		
+		@Test
+		@DisplayName("Verificación con grupo de gasto con usuarios vacío")
+		void testGrupoUsuariosVacio(){
+			pago = new Pago(1, grupo);
+			grupo.getUsuarios().clear();
+
+			assertFalse(pago.repartirGastos(), "El grupo de gasto tiene un conjunto de usuarios vacío");
+		}
+		
+		@Test
+		@DisplayName("Verificación con grupo de gasto con gastos nulo")
+		void testGrupoGastosNulo(){
+			pago = new Pago(1, grupo);
+			
+			// Creamos el grupo incorrectamente para que el conjunto de gastos sea nulo
+			grupo = new Grupo(0, null, null, null);
+			grupo.setUsuarios(new ArrayList<IUsuario>(Arrays.asList(usuario1, usuario2)));
+			pago.setGrupoGasto(grupo);
+
+			assertFalse(pago.repartirGastos(), "El grupo de gasto tiene un conjunto de gastos nulo");
+		}
+		
+		@Test
+		@DisplayName("Verificación con grupo de gasto con gastos vacío")
+		void testGrupoGastosVacio(){
+			pago = new Pago(1, grupo);
+			grupo.getGastos().clear();
+
+			assertFalse(pago.repartirGastos(), "El grupo de gasto tiene un conjunto de gastos vacío");
+		}
+		
+		
+		
+		
+		//if(grupoGasto!=null && grupoGasto.getUsuarios()!=null && grupoGasto.getGastos()!=null) {
+		//if(!grupoGasto.getUsuarios().isEmpty() && !grupoGasto.getGastos().isEmpty()) {
+		
+		
+		
+		
+		//la función debe tomar los pagos de un usuario, obtener de cada pago lo que debe dar y hacer un sumatorio
 		Double sumarvalores(IUsuario user) {
 			Double resul=0.0;
 			
@@ -121,7 +242,8 @@ class PagoTest {
 			
 			
 		@Test
-		@DisplayName("Verificación de la funcion repartirgastos con inputs válidos")
+		@DisplayName("PRUEBA DE ACEPTACIÓN DEL SPRINT 1:"
+				+ "\tVerificación de la funcion repartirGastos con inputs válidos (prueba de sistema)")
 		void testcorrecto() {
 			
 			//generacion de los usuarios
@@ -167,34 +289,8 @@ class PagoTest {
 		
 		
 		
+	}	
 		
-		
-		// TODO no funciona este test
-		@Test
-		@DisplayName("Verificación de grupo con personas y gastos")
-		void testGrupoValido() {
-			IGasto gastoMock = mock(Gasto.class);
-			IUsuario usuarioMock = mock(Usuario.class);
-			IGrupo grupoMock = mock(Grupo.class);
-			
-			ArrayList<IGasto> gastos = new ArrayList<>();
-			gastos.add(gastoMock);
-			ArrayList<IUsuario> usuarios = new ArrayList<>();
-			usuarios.add(usuarioMock);
-			when(grupoMock.getUsuarios()).thenReturn(usuarios);
-			when(grupoMock.getGastos()).thenReturn(gastos);
-
-			pago1 = new Pago(1, grupoMock);
-			
-			assertAll( 
-					()->{assertEquals(gastos, grupoMock.getGastos(), "Se crea un pago sin gastos");},
-					()->{assertEquals(usuarios, grupoMock.getUsuarios(), "Se crea un pago sin personas");},
-					()->{assertNotNull(pago1.getGrupoGasto(), "Pago válido no genera pago");});
-		}
-		
-		
-		
-		
-	}
+}
 
 

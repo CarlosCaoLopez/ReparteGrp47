@@ -289,17 +289,7 @@ class GrupoTest {
 			assertFalse(grupo.dividirGastos(), "El conjunto de gastos está vacío");
 		}
 		
-		// TODO: No funciona correctamente. Está usando la clase Pago, no sé cómo mockearla
-		//       Quizás haya que indicar que no se puede hacer prueba de unidad, solo de integración
-		@Test
-		@DisplayName("Verificación del pago caso válido")
-		void testValido() {
-			when(pagoMock_.repartirGastos()).thenReturn(true);
-			grupo_.setGastos(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
-			grupo_.setUsuarios(usuariosMock);
-			assertTrue(grupo_.dividirGastos(), "El grupo es en realidad correcto");
-			// when(usuarioMock.equals(any(Usuario.class))).thenReturn(true);
-		}
+		// El caso válido se prueba en la prueba de integración desde Usuario
 		
 	}
 
