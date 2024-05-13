@@ -51,15 +51,14 @@ public class Gasto implements IGasto {
 
 	//funcion para meter el gasto dentro de un grupo
 	@Override
-	public IGasto registrarGasto(IGrupo grupo) {
+	public boolean registrarGasto(IGrupo grupo) {
 		if(grupo != null) {
-			grupo.anadirGasto(this);
-			return this;
-		}else {
-			return null;
+
+			return(grupo.anadirGasto(this));
 		}
 		
-		
+		return false;
+
 	}
 	
 	@Override

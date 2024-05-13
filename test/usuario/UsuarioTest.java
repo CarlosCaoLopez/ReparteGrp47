@@ -576,33 +576,155 @@ class UsuarioTest {
 		 }
 	}
 	
-	@Nested 
-	@DisplayName("Pruebas del método de Usuario.eliminarGrupo()")
-	class eliminarGrupoIntegracion{ //Las pruebas de integración grupo deben ser de integración
-									// ya que dependen del método dividirGastos() que a su vez
-									// depende de otros métodos de grupo (lo cual complica el uso de mocks)
-		AutoCloseable acl;
-		IGrupo grupoMock;
+	@Nested
+	@DisplayName("Pruebas de integración de incorporar un miembro")
+	class incorporarMiembroIntegracion {
+		IGrupo grupo;
 		Usuario usuario, usuario1;
-		ArrayList<IUsuario> Lideres;
+		ArrayList<IUsuario> Lideres, usuarios;
 		
 		@BeforeEach
 		void setUp() throws Exception {
-			grupoMock = mock(IGrupo.class);
-			acl = MockitoAnnotations.openMocks(this);
-			
+			usuarios = new ArrayList<IUsuario>();
 			usuario = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
 			usuario1 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
-			
-			Lideres = new ArrayList<IUsuario>();
-			Lideres.add(usuario);
-			when(grupoMock.getLideres()).thenReturn(Lideres);
+			usuarios.add(usuario);
+			grupo = new Grupo(1, "nombreGrupo", "descripcion", usuarios);
 		}
 
 		@AfterEach
 		void tearDown() throws Exception {
-			acl.close();
 		}
+		@Test
+		@DisplayName("[Incorporar] Verificación de que el usuario a incorporar es correcto")
+		void testUsuarioNoNulo() {
+			
+			assertAll(	()-> {assertTrue(grupo.anhadirLider(usuario), "Usuario añadido correcto invalidado en anhadir lider");}, 	
+						()-> {assertFalse(usuario.incorporarMiembroEnGrupo(null, grupo), "Usuario nulo introducido tratado como válido");},
+						()-> {assertTrue(usuario.incorporarMiembroEnGrupo(usuario1, grupo), "Usuario correcto introducido tratado como inválido");}
+					);
+		}
+		
+		 @Test
+		 @DisplayName("[Incorporar] Verificación grupo nulo o no nulo")
+		 void testIGrupoNulo() {
+			 assertAll(	()->{assertTrue(grupo.anhadirLider(usuario), "Usuario añadido correcto invalidado en anhadir lider");},
+					 	()->{assertFalse(usuario.incorporarMiembroEnGrupo(usuario1, null), "Grupo nulo tratado como válido");},
+					 	()->{assertTrue(usuario.incorporarMiembroEnGrupo(usuario1, grupo), "Grupo no nulo tratado como inválido");}
+					 	);
+		 }
+		
+		 @Test
+		 @DisplayName("[Incorporar] Verificación grupo sin llamador en lideres")
+		 void testIGrupoSinLlamadorEnLideres() {
+			 assertFalse(usuario.incorporarMiembroEnGrupo(usuario1, grupo), "Grupo sin llamador en lideres validado");
+		 }
+		 @Test
+		 @DisplayName("[Incorporar] Verificación grupo con llamador en lideres")
+		 void testIGrupoLlamadorEnLideres() {
+			 assertAll(	()->{assertTrue(grupo.anhadirLider(usuario), "Usuario añadido correcto invalidado en anhadir lider");},
+					 	()->{assertTrue(usuario.incorporarMiembroEnGrupo(usuario1, grupo), "Grupo con llamador en lideres invalidado");}
+					 	);
+			
+		 }
+		 
+	}
+	
+	@Nested
+	@DisplayName("Pruebas de integración de eliminar un miembro")
+	class eliminarMiembroIntegracion {
+		IGrupo grupo;
+		Usuario usuario, usuario1;
+		ArrayList<IUsuario> Lideres, usuarios;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuarios = new ArrayList<IUsuario>();
+			usuario = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuario1 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuarios.add(usuario);
+			usuarios.add(usuario1);
+			grupo = new Grupo(1, "nombreGrupo", "descripcion", usuarios);
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+		}
+		@Test
+		@DisplayName("[Eliminar] Verificación de que el usuario a eliminar es correcto")
+		void testUsuarioNoNulo() {
+			
+			assertAll(	()-> {assertTrue(grupo.anhadirLider(usuario), "Usuario añadido correcto invalidado en anhadir lider");}, 	
+						()-> {assertFalse(usuario.eliminarMiembroEnGrupo(null, grupo), "Usuario nulo introducido tratado como válido");},
+						()-> {assertTrue(usuario.eliminarMiembroEnGrupo(usuario1, grupo), "Usuario correcto introducido tratado como inválido");}
+					);
+		}
+		
+		 @Test
+		 @DisplayName("[Eliminar] Verificación grupo nulo o no nulo")
+		 void testGrupoNulo() {
+			 assertAll(	()->{assertTrue(grupo.anhadirLider(usuario), "Usuario añadido correcto invalidado en anhadir lider");},
+					 	()->{assertFalse(usuario.eliminarMiembroEnGrupo(usuario1, null), "Grupo nulo tratado como válido");},
+					 	()->{assertTrue(usuario.eliminarMiembroEnGrupo(usuario1, grupo), "Grupo no nulo tratado como inválido");}
+					 	);
+		 }
+		
+		 @Test
+		 @DisplayName("[Eliminar] Verificación grupo sin llamador en lideres")
+		 void testGrupoSinLlamadorEnLideres() {
+			 assertFalse(usuario.eliminarMiembroEnGrupo(usuario1, grupo), "Grupo sin llamador en lideres validado");
+		 }
+		 @Test
+		 @DisplayName("[Eliminar] Verificación grupo con llamador en lideres")
+		 void testGrupoLlamadorEnLideres() {
+			 assertAll(	()->{assertTrue(grupo.anhadirLider(usuario), "Usuario añadido correcto invalidado en anhadir lider");},
+					 	()->{assertTrue(usuario.eliminarMiembroEnGrupo(usuario1, grupo), "Grupo con llamador en lideres invalidado");}
+					 	);
+			
+		 }
+		 
+	}
+	
+	@Nested 
+	@DisplayName("Pruebas (integración) del método de Usuario.eliminarGrupo()")
+	class eliminarGrupoIntegracion{ //Las pruebas de integración grupo deben ser de integración
+									// ya que dependen del método dividirGastos() que a su vez
+									// depende de otros métodos de grupo (lo cual complica el uso de mocks)
+		IGrupo grupo;
+		Usuario usuario, usuario1;
+		ArrayList<IUsuario> Lideres, usuarios;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuarios = new ArrayList<IUsuario>();
+			usuario = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuario1 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuarios.add(usuario);
+			usuarios.add(usuario1);
+			grupo = new Grupo(1, "nombreGrupo", "descripcion", usuarios);
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+		}
+		
+		@DisplayName("Verificación grupo nulo")
+		void testGrupoNulo() {
+			assertTrue(usuario.eliminarGrupo(grupo), "Grupo con llamador en lideres invalidado");
+		 }
+		
+		@DisplayName("Verificación grupo no nulo sin llamador en lideres")
+		void testGrupoSinLlamadorEnLideres() {
+			assertTrue(usuario.eliminarGrupo( grupo), "Grupo con llamador en lideres invalidado");
+		 }
+		
+		@DisplayName("Verificación grupo no nulo con llamador en lideres")
+		void testGrupoConLlamadorEnLideres() {
+			 assertAll(	()->{assertTrue(grupo.anhadirLider(usuario), "Usuario añadido correcto invalidado en anhadir lider");},
+					 	()->{assertTrue(usuario.eliminarGrupo(grupo), "Grupo con llamador en lideres invalidado");}
+					 	);
+			
+		 }
 	}
 
 	@Nested 

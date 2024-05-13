@@ -11,7 +11,7 @@ public interface IGasto {
 //	private IUsuario pagador;
 	
 	//public void asignarGrupo(IGasto gasto);
-	public IGasto registrarGasto(IGrupo grupo);
+	public boolean registrarGasto(IGrupo grupo);
 	
 	//getters
 	public int getId();
