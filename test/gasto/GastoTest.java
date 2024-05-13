@@ -1,13 +1,18 @@
 package gasto;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -158,24 +163,112 @@ class GastoTest {
 	}
 	
 	
-	// TODO Habría que comprobar que el gasto se ha creado correctamente, porque el grupo al que está asociado
-	// no contiene al usuario (el grupo está vacío), y diría que el gasto no se está creando correctamente
-    @Test
-    @DisplayName("Testeo de registrar gasto")
-    void testRegistrarGasto() {
-        // Creamos un mock de la interfaz IGrupo
-        IGrupo grupoMock = mock(IGrupo.class);
-        // Creamos un mock de la interfaz IUsuario
-        IUsuario usuarioMock = mock(IUsuario.class);
+	@Nested
+	@DisplayName("Pruebas de unidad de registrarGasto")
+	class UnidadRegistrarGasto{
+	
+	
+		@BeforeEach
+		void setUp() throws Exception {
+		}
+		
+		// TODO Habría que comprobar que el gasto se ha creado correctamente, porque el grupo al que está asociado
+		// no contiene al usuario (el grupo está vacío), y diría que el gasto no se está creando correctamente
+	    @Test
+	    @DisplayName("Testeo válido de registrar gasto")
+	    void testRegistrarGasto() {
+	        // Creamos un mock de la interfaz IGrupo
+	        IGrupo grupoMock = mock(IGrupo.class);
+	        // Creamos un mock de la interfaz IUsuario
+	        IUsuario usuarioMock = mock(IUsuario.class);
 
-        // Creamos una instancia de la clase Gasto
-        IGasto gasto = new Gasto(1, 100.0, grupoMock, usuarioMock, "Negocio");
+	        // Creamos una instancia de la clase Gasto
+	        IGasto gasto = new Gasto(1, 100.0, grupoMock, usuarioMock, "Negocio");
 
-        // Llamamos al método registrarGasto con el mock de grupo como argumento
-        gasto.registrarGasto(grupoMock);
+	        // Llamamos al método registrarGasto con el mock de grupo como argumento
+	        gasto.registrarGasto(grupoMock);
 
-        // Verificamos que el método anadirGasto del grupoMock haya sido llamado exactamente una vez
-        verify(grupoMock, times(1)).anadirGasto(gasto);
-    }
+	        // Verificamos que el método anadirGasto del grupoMock haya sido llamado exactamente una vez
+	        verify(grupoMock, times(1)).anadirGasto(gasto);
+	    }
+	
+    
+    
+	}
+	
+	
+	@Nested
+	@DisplayName("Pruebas de integración de registrarGasto")
+	class IntegraciónRegistrarGasto{
+	
+	
+		IUsuario user1;
+		IUsuario user2;
+		IGrupo grupo;
+		IGasto gasto;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			
+			//generamos dos usuarios de prueba y la lista que los contiene
+			user1 = new Usuario(1, "user1", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			user2 = new Usuario(99, "user2", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			ArrayList <IUsuario> listausers=new ArrayList<IUsuario>();
+			listausers.add(user1);
+			listausers.add(user2);
+			
+			//generamos un grupo válido
+			grupo = new Grupo(4, "grupo1", "descripcion", listausers);
+			
+			//generamos un gasto válido con el user1 como pagador
+			gasto = new Gasto(99, 99.9, grupo, user1);
+
+			
+			
+		}
+		
+		
+		
+	    @Test
+	    @DisplayName("Testeo válido de registrar gasto")
+	    void testRegistrarGasto() {
+	        
+	    	gasto.registrarGasto(grupo);
+	    	
+	    	assertAll( ()->{assertTrue(grupo.getGastos().contains(gasto), "Error, el grupo de gasto no contiene el gasto generado");},
+					()->{assertTrue(grupo.getUsuarios().contains(gasto.getPagador()), "Error, el grupo no contiene al usuario pagador");} 
+					);
+		
+	    }
+	
+	    @Test
+	    @DisplayName("Testeo no válido de registrar gasto (gasto nulo)")
+	    void testRegistrarGasto_gastonulo() {
+	        
+	    	gasto.registrarGasto(null);
+	    	
+	    	assertAll( ()->{assertFalse(grupo.getGastos().contains(gasto), "Error, el grupo de gasto contiene el gasto generado cuando no debería");});
+		
+	    }
+	    
+	    
+	    @Test
+	    @DisplayName("Testeo no válido de registrar gasto (grupo no contiene al pagador)")
+	    void testRegistrarGasto_sinpagador() {
+	        
+	    	ArrayList<IUsuario> listausers2=new ArrayList<IUsuario>();
+	    	listausers2.add(user2);
+	    	IGrupo grupo2 = new Grupo(99, "grupo2", "descripcion", listausers2);
+	    	
+	    	gasto.registrarGasto(grupo2);
+	    	
+	    	assertAll( ()->{assertFalse(grupo2.getGastos().contains(gasto), "Error, el grupo de gasto contiene el gasto generado cuando no debería");},
+					()->{assertFalse(grupo2.getUsuarios().contains(gasto.getPagador()), "Error, el pagador está en el grupo");} 
+					);
+		
+	    }
+    
+    
+	}
 
 }
