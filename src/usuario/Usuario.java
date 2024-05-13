@@ -153,8 +153,7 @@ public class Usuario implements IUsuario {
 	@Override 
 	public boolean incorporarMiembroEnGrupo(IUsuario usuario, IGrupo grupo) {
 		if(grupo != null && grupo.getLideres().contains(this) && usuario != null) {
-			grupo.anadirMiembro(usuario);
-			return true;
+			return grupo.anadirMiembro(usuario);
 		}
 		return false;
 	}
@@ -162,8 +161,7 @@ public class Usuario implements IUsuario {
 	@Override 
 	public boolean eliminarMiembroEnGrupo(IUsuario usuario, IGrupo grupo) {
 		if(grupo != null && grupo.getLideres().contains(this) && usuario != null) {
-			grupo.eliminarMiembro(usuario);
-			return true;
+			return grupo.eliminarMiembro(usuario);
 		}
 		return false;
 	}
