@@ -193,7 +193,7 @@ class GastoTest {
 		    @DisplayName("Testeo válido de registrar gasto")
 		    void testRegistrarGasto_valido() {
 		       
-		    	assertTrue(gasto.registrarGasto(grupomock), "Error, no se nos true cuando se ha pasado un grupo válido");
+		    	assertTrue(gasto.registrarGasto(grupomock), "Error, no se recibe true cuando se ha pasado un grupo válido");
 			
 		    }
 		  

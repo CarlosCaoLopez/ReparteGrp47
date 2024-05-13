@@ -132,15 +132,6 @@ public class Grupo implements IGrupo {
 		return false;
 	}
 
-	/*
-	 * @Override public void modificarGasto(IGasto gasto) { if(gasto != null) {
-	 * 
-	 * int indice = this.gastos.indexOf(gasto); // Obtenemos el índice donde se
-	 * encuentra el objeto if(indice != -1) { // Si el objeto existe en el ArrayList
-	 * this.gastos.set(indice, gasto); // Lo sustituímos } }
-	 * 
-	 * }
-	 */
 
 	@Override
 	public boolean dividirGastos() {

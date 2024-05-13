@@ -32,26 +32,13 @@ class PagoTest {
 	
 	IPago pago1, pago2, pago3;
 	
-	/*
-	 * AutoCloseable acl; // Clases simuladas
-	 * 
-	 * @Mock IGasto gasto;
-	 * 
-	 * @Mock IUsuario usuario;
-	 * 
-	 * @Mock IGrupo grupo;
-	 * 
-	 * @InjectMocks IPago pago;
-	 */
 
 	@BeforeEach
 	void setUp() throws Exception {
-		//acl = MockitoAnnotations.openMocks(this);
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
-		//acl.close();
 	}
 
 	@Nested
@@ -145,18 +132,6 @@ class PagoTest {
 			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario1, usuario2)));
 			gasto = new Gasto(1, 10.0, grupo, usuario2);
 			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
-			
-			/*
-			pago.setGastos(grupo.getGastos());
-			pago.setCuotas(new HashMap<>());
-			pago.getCuotas().put(usuario1, new HashMap<>());
-			pago.getCuotas().put(usuario2, new HashMap<>());
-			pago.getCuotas().get(usuario1).put(usuario2, 10.0);
-			pago.getCuotas().get(usuario2).put(usuario1, 0.0);
-			pago.setPagado(new HashMap<>());
-			pago.getPagado().put(usuario1, false);
-			pago.getPagado().put(usuario2, true);
-			 */
 		}
 		
 		@Test
@@ -212,14 +187,7 @@ class PagoTest {
 			assertFalse(pago.repartirGastos(), "El grupo de gasto tiene un conjunto de gastos vacío");
 		}
 		
-		
-		
-		
-		//if(grupoGasto!=null && grupoGasto.getUsuarios()!=null && grupoGasto.getGastos()!=null) {
-		//if(!grupoGasto.getUsuarios().isEmpty() && !grupoGasto.getGastos().isEmpty()) {
-		
-		
-		
+
 		
 		//la función debe tomar los pagos de un usuario, obtener de cada pago lo que debe dar y hacer un sumatorio
 		Double sumarvalores(IUsuario user) {
@@ -243,7 +211,7 @@ class PagoTest {
 			
 		@Test
 		@DisplayName("PRUEBA DE ACEPTACIÓN DEL SPRINT 1:"
-				+ "\tVerificación de la funcion repartirGastos con inputs válidos (prueba de sistema)")
+				+ "Verificación de la funcion repartirGastos con inputs válidos (prueba de sistema)")
 		void testcorrecto() {
 			
 			//generacion de los usuarios

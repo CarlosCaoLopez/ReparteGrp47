@@ -5,13 +5,12 @@ package usuario;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -27,8 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.platform.commons.util.StringUtils;
-import org.junit.platform.commons.util.StringUtils.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -39,8 +36,6 @@ import grupo.Grupo;
 import grupo.IGrupo;
 import pago.IPago;
 import pago.Pago;
-
-import static org.mockito.ArgumentMatchers.*;
 
 class UsuarioTest {
 	// Fixtures
@@ -483,7 +478,6 @@ class UsuarioTest {
 	@Nested
 	@DisplayName("Pruebas de incorporación y eliminación de miembros en Grupo desde Usuario")
 	class incorporar_eliminarEnGrupoUnidad{
-		AutoCloseable acl;
 		IGrupo grupoMock;
 		Usuario usuario, usuario1;
 		ArrayList<IUsuario> Lideres;
@@ -491,7 +485,6 @@ class UsuarioTest {
 		@BeforeEach
 		void setUp() throws Exception {
 			grupoMock = mock(IGrupo.class);
-			acl = MockitoAnnotations.openMocks(this);
 			
 			usuario = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
 			usuario1 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
@@ -505,7 +498,6 @@ class UsuarioTest {
 
 		@AfterEach
 		void tearDown() throws Exception {
-			acl.close();
 		}
 		
 		/**
@@ -687,12 +679,14 @@ class UsuarioTest {
 	
 	@Nested 
 	@DisplayName("Pruebas (integración) del método de Usuario.eliminarGrupo()")
-	class eliminarGrupoIntegracion{ //Las pruebas de integración grupo deben ser de integración
-									// ya que dependen del método dividirGastos() que a su vez
-									// depende de otros métodos de grupo (lo cual complica el uso de mocks)
+	class eliminarGrupoIntegracion{
+		// Las pruebas de eliminar grupo son directamente de integración, ya que no hay funcionalidad en usuario,
+		// y dependen del método dividirGastos(), que a su vez depende de otros métodos de grupo (lo cual complica 
+		// bastante el uso de mocks)
 		IGrupo grupo;
 		Usuario usuario, usuario1;
 		ArrayList<IUsuario> Lideres, usuarios;
+		IGasto gasto;
 		
 		@BeforeEach
 		void setUp() throws Exception {
@@ -702,29 +696,43 @@ class UsuarioTest {
 			usuarios.add(usuario);
 			usuarios.add(usuario1);
 			grupo = new Grupo(1, "nombreGrupo", "descripcion", usuarios);
+			
+			gasto = new Gasto(1, 4.5, grupo, usuario);
+			grupo.getGastos().add(gasto);
 		}
 
 		@AfterEach
 		void tearDown() throws Exception {
 		}
 		
+		@Test
 		@DisplayName("Verificación grupo nulo")
 		void testGrupoNulo() {
-			assertTrue(usuario.eliminarGrupo(grupo), "Grupo con llamador en lideres invalidado");
-		 }
+			assertFalse(usuario.eliminarGrupo(null), "El grupo es nulo");
+		}
 		
+		@Test
 		@DisplayName("Verificación grupo no nulo sin llamador en lideres")
 		void testGrupoSinLlamadorEnLideres() {
-			assertTrue(usuario.eliminarGrupo( grupo), "Grupo con llamador en lideres invalidado");
-		 }
+			
+			assertFalse(usuario.eliminarGrupo(grupo), "Grupo sin llamador en líderes validado");
+		}
 		
+		@Test
+		@DisplayName("Verificación grupo sin gastos (no se pueden dividir gastos)")
+		void testGrupoSinGastos() {
+			grupo.getGastos().clear();
+			
+			assertFalse(usuario.eliminarGrupo(grupo), "Grupo sin gastos validado");
+		}
+		
+		@Test
 		@DisplayName("Verificación grupo no nulo con llamador en lideres")
 		void testGrupoConLlamadorEnLideres() {
-			 assertAll(	()->{assertTrue(grupo.anhadirLider(usuario), "Usuario añadido correcto invalidado en anhadir lider");},
-					 	()->{assertTrue(usuario.eliminarGrupo(grupo), "Grupo con llamador en lideres invalidado");}
-					 	);
-			
-		 }
+			grupo.anhadirLider(usuario);
+
+			assertTrue(usuario.eliminarGrupo(grupo), "Grupo con llamador en líderes invalidado");
+		}
 	}
 
 	@Nested 
@@ -750,7 +758,7 @@ class UsuarioTest {
 		@Test
 		@DisplayName("Verificación de que el grupo a modificar es no nulo")
 		void testGrupoNulo() {
-			assertFalse(usuario3.gestionarGrupo(null, "nombre", "descripcion", usuarios), "Usuario no forma parte del grupo");
+			assertFalse(usuario3.gestionarGrupo(null, "nombre", "descripcion", usuarios), "El grupo es nulo");
 		}
 		
 		@ParameterizedTest
@@ -807,6 +815,92 @@ class UsuarioTest {
 			ArrayList<IUsuario> usuarios = new ArrayList<IUsuario>();
 			usuarios.add(usuario3);	
 			assertTrue(usuario3.gestionarGrupo(grupoMock, "nombre", descripcion, usuarios), "Descripcion válida introducida, se trata como no válida");
+
+		}
+	}
+	
+	@Nested 
+	@DisplayName("Pruebas de integración de gestión de grupo desde un Usuario")
+	class gestionarGrupoIntegración{
+		
+		IGrupo grupo;
+		Usuario usuario3;
+		ArrayList<IUsuario> usuarios;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario3 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuarios = new ArrayList<>();
+			usuarios.add(usuario3);
+			grupo = new Grupo(1, "nombre", "descripción", usuarios);
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el grupo a modificar es no nulo")
+		void testGrupoNulo() {
+			assertFalse(usuario3.gestionarGrupo(null, "nombre", "descripcion", usuarios), "El grupo es nulo");
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el usuario que gestiona el grupo debe incluir algún usuario")
+		@NullAndEmptySource
+		void testUsuariosNulos(ArrayList<IUsuario> usuarios_) {
+			assertFalse(usuario3.gestionarGrupo(grupo, "nombre", "descripcion", usuarios_), "Usuario no forma parte del grupo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el usuario que crea el grupo se encuentra en [usuarios] (caso no válido)")
+		void testUsuarioFuera() {
+			IUsuario usuario4 = new Usuario(4, "nomeUsuario", "nomeReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuarios.clear();
+			usuarios.add(usuario4);
+			assertFalse(usuario3.gestionarGrupo(grupo, "nombre", "descripcion", usuarios), "Usuario no forma parte del grupo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el usuario que crea el grupo se encuentra en [usuarios] (caso válido)")
+		void testUsuarioDentro() {
+			usuarios.add(usuario3);
+			assertTrue(usuario3.gestionarGrupo(grupo, "nombre", "descripcion", usuarios), "Usuario dentro del grupo invalidado");
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el nombre no es nulo ni vacío (caso no válido)")
+		@NullAndEmptySource
+		void testNombreNoValido(String nombre) {
+			usuarios.add(usuario3);
+			assertFalse(usuario3.gestionarGrupo(grupo, nombre, "descripcion", usuarios), "Nombre inválido introducido, se trata como válido");
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el nombre no es nulo ni vacío (caso válido)")
+		@CsvSource({"nombre"})
+		void testNombreValido(String nombre) {
+			usuarios.add(usuario3);
+			assertTrue(usuario3.gestionarGrupo(grupo, nombre, "descripcion", usuarios), "Nombre válido introducido, se trata como no válido");
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que la descripción no es nula ni vacía (caso no válido)")
+		@NullAndEmptySource
+		void testDescripcionNoValida(String descripcion) {
+			usuarios.add(usuario3);	
+			assertFalse(usuario3.gestionarGrupo(grupo, "nombre", descripcion, usuarios), "Descripcion inválida introducida, se trata como válida");
+
+		}		
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que la descripción no es nula ni vacía (caso válido)")
+		@CsvSource({"descripcion"})
+		void testDescripcionValida(String descripcion) {
+			ArrayList<IUsuario> usuarios = new ArrayList<IUsuario>();
+			usuarios.add(usuario3);	
+			assertTrue(usuario3.gestionarGrupo(grupo, "nombre", descripcion, usuarios), "Descripcion válida introducida, se trata como no válida");
 
 		}
 	}
@@ -1447,12 +1541,6 @@ class UsuarioTest {
 	@DisplayName("Prueba de aceptación del sprint 2 (se testean desde el reparto de los pagos a la realización de estos)")
 	class realizarPago_repartirgastos{
 		
-		
-		IUsuario paco;
-		IUsuario maria;
-		IUsuario felipe;
-		IGrupo grupofinal;
-		ArrayList<IUsuario> listausers;
 		int notificacioneseva=0,notificacionesjuan=0;
 		int pagadaseva=0,pagadasjaun=0;
 		@Test
@@ -1493,6 +1581,7 @@ class UsuarioTest {
 			String buscar = "Pago pendiente";
 			int indice = 0;
 			
+			// Comprobamos cuántas veces pone "Pago pendiente" y "Se ha pagado" en la notificación de eva y juan
 			while (indice != -1) {
 				indice = str.indexOf("Pago pendiente", indice);
 			    if (indice != -1) {
