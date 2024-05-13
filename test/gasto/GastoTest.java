@@ -163,37 +163,50 @@ class GastoTest {
 	}
 	
 	
+	//TODO unidad no terminadas
 	@Nested
 	@DisplayName("Pruebas de unidad de registrarGasto")
 	class UnidadRegistrarGasto{
 	
 	
+		IUsuario usermock1;
+		IUsuario usermock2;
+		IGrupo grupomock;
+		IGasto gasto;
+		
 		@BeforeEach
 		void setUp() throws Exception {
+			
+			//generamos dos usuarios de prueba y la lista que los contiene
+			
+			usermock1= mock(IUsuario.class);
+			usermock2= mock(IUsuario.class);
+			grupomock= mock(IGrupo.class);
+			
+			//generamos un gasto válido con el user1 como pagador
+			gasto = new Gasto(99, 99.9, grupomock, usermock1);
+
 		}
 		
-		// TODO Habría que comprobar que el gasto se ha creado correctamente, porque el grupo al que está asociado
-		// no contiene al usuario (el grupo está vacío), y diría que el gasto no se está creando correctamente
-	    @Test
-	    @DisplayName("Testeo válido de registrar gasto")
-	    void testRegistrarGasto() {
-	        // Creamos un mock de la interfaz IGrupo
-	        IGrupo grupoMock = mock(IGrupo.class);
-	        // Creamos un mock de la interfaz IUsuario
-	        IUsuario usuarioMock = mock(IUsuario.class);
-
-	        // Creamos una instancia de la clase Gasto
-	        IGasto gasto = new Gasto(1, 100.0, grupoMock, usuarioMock, "Negocio");
-
-	        // Llamamos al método registrarGasto con el mock de grupo como argumento
-	        gasto.registrarGasto(grupoMock);
-
-	        // Verificamos que el método anadirGasto del grupoMock haya sido llamado exactamente una vez
-	        verify(grupoMock, times(1)).anadirGasto(gasto);
-	    }
-	
     
-    
+		  @Test
+		    @DisplayName("Testeo válido de registrar gasto")
+		    void testRegistrarGasto_valido() {
+		       
+		    	assertTrue(gasto.registrarGasto(grupomock).equals(gasto), "Error, no se nos devuelve this desde el método interno, de haber funcionado tendríamos que recibirlo");
+			
+		    }
+		  
+		  @Test
+		    @DisplayName("Testeo no válido de registrar gasto (introducimos null)")
+		    void testRegistrarGasto_null() {
+		        
+		    	assertTrue(gasto.registrarGasto(null)==null, "Error, deberíamos recibir null en caso de que la condición interna se rechace. No es así");
+			
+		    }
+		  
+		  //el resto de chequeos se realizan en grupo.anadirgasto(), esta función revisa si se cumple o no la condición de null para su ejecución.
+		
 	}
 	
 	
@@ -228,7 +241,6 @@ class GastoTest {
 		}
 		
 		
-		
 	    @Test
 	    @DisplayName("Testeo válido de registrar gasto")
 	    void testRegistrarGasto() {
@@ -242,18 +254,18 @@ class GastoTest {
 	    }
 	
 	    @Test
-	    @DisplayName("Testeo no válido de registrar gasto (gasto nulo)")
-	    void testRegistrarGasto_gastonulo() {
+	    @DisplayName("Testeo no válido de registrar gasto (grupo nulo)")
+	    void testRegistrarGasto_gruponulo() {
 	        
 	    	gasto.registrarGasto(null);
 	    	
-	    	assertAll( ()->{assertFalse(grupo.getGastos().contains(gasto), "Error, el grupo de gasto contiene el gasto generado cuando no debería");});
+	    	assertAll( ()->{assertTrue(gasto.registrarGasto(null)==null, "Error, el grupo de gasto contiene el gasto generado cuando no debería");});
 		
 	    }
 	    
 	    
 	    @Test
-	    @DisplayName("Testeo no válido de registrar gasto (grupo no contiene al pagador)")
+	    @DisplayName("Testeo no válido de registrar gasto (grupo existe y no contiene al pagador)")
 	    void testRegistrarGasto_sinpagador() {
 	        
 	    	ArrayList<IUsuario> listausers2=new ArrayList<IUsuario>();
@@ -268,6 +280,7 @@ class GastoTest {
 		
 	    }
     
+	   
     
 	}
 
