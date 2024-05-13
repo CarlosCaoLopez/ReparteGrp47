@@ -50,10 +50,12 @@ public class Gasto implements IGasto {
 	@Override
 	public boolean registrarGasto(IGrupo grupo) {
 		if(grupo != null) {
+
 			return(grupo.anadirGasto(this));
 		}
 		
 		return false;
+
 	}
 	
 	@Override
