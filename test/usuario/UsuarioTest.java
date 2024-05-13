@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.platform.commons.util.StringUtils;
+import org.junit.platform.commons.util.StringUtils.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -1329,7 +1331,8 @@ class UsuarioTest {
 		IUsuario felipe;
 		IGrupo grupofinal;
 		ArrayList<IUsuario> listausers;
-		
+		int notificacioneseva=0,notificacionesjuan=0;
+		int pagadaseva=0,pagadasjaun=0;
 		@Test
 		@DisplayName("Realizar pago caso válido")
 		void testAceptacion() {
@@ -1360,41 +1363,64 @@ class UsuarioTest {
 			//se dividen los gastos del grupo
 			eva.dividirGastos(loscuatro);
 			
-			System.out.println("Pre-Pagar");
-			for(String elm : eva.getNotificaciones()) {
-				System.out.println(elm);
-			}
-			for(String elm : luis.getNotificaciones()) {
-				System.out.println(elm);
-			}
-			for(String elm : juan.getNotificaciones()) {
-				System.out.println(elm);
-			}
-			for(String elm : marta.getNotificaciones()) {
-				System.out.println(elm);
-			}
-			
-		
-			for(IPago elm : eva.getPagos()) {
-				eva.realizarPago(elm);
-			}
 			
 			
-			System.out.println("Post-Pagar");
+			
+			String str = eva.getNotificaciones().get(0);
+			String str2 = juan.getNotificaciones().get(0);
+			String buscar = "Pago pendiente";
+			int indice = 0;
+			
+			while (indice != -1) {
+				indice = str.indexOf("Pago pendiente", indice);
+			    if (indice != -1) {
+			    	notificacioneseva++;
+			        indice += buscar.length();
+			    }
+			}
+			indice = 0;
+			while (indice != -1) {
+				indice = str2.indexOf("Pago pendiente", indice);
+			    if (indice != -1) {
+			    	notificacionesjuan++;
+			        indice += buscar.length();
+			    }
+			}
+			
+			eva.realizarPago(eva.getPagos().get(0));
+			str = eva.getNotificaciones().get(0);
+			str2 = juan.getNotificaciones().get(0);
+			
+			indice = 0;
+			while (indice != -1) {
+				indice = str.indexOf("Se ha pagado", indice);
+			    if (indice != -1) {
+			    	pagadaseva++;
+			        indice += buscar.length();
+			    }
+			}
+			indice = 0;
+			while (indice != -1) {
+				indice = str2.indexOf("Se ha pagado", indice);
+			    if (indice != -1) {
+			    	pagadasjaun++;
+			        indice += buscar.length();
+			    }
+			}
+			
+			
+			
+			
+			assertAll( 
+					
+					()->{assertTrue(notificacioneseva==3,"La cantidad de no pagadas de eva está mal");},
+					()->{assertTrue(notificacionesjuan==3,"La cantidad no pagadas de juan está mal");},
+					()->{assertTrue(pagadaseva==3,"La cantidad de pagadas de eva está mal");},
+					()->{assertTrue(pagadasjaun==0,"La cantidad de pagadas de juan está mal");});
+			
+			
 
-			for(String elm : eva.getNotificaciones()) {
-				System.out.println(elm);
-			}
-			for(String elm : luis.getNotificaciones()) {
-				System.out.println(elm);
-			}
-			for(String elm : juan.getNotificaciones()) {
-				System.out.println(elm);
-			}
-			for(String elm : marta.getNotificaciones()) {
-				System.out.println(elm);
-			}
-		
+			
 	}
 	
 	
