@@ -1,11 +1,14 @@
 package gasto;
 
+
 import grupo.IGrupo;
 import usuario.IUsuario;
 import usuario.Usuario;
 
 import java.util.Objects;
 import java.util.Random;
+
+import gasto.IGasto;
 
 public class Gasto implements IGasto {
 
