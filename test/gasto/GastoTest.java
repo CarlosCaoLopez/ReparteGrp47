@@ -163,7 +163,6 @@ class GastoTest {
 	}
 	
 	
-	//TODO unidad no terminadas
 	@Nested
 	@DisplayName("Pruebas de unidad de registrarGasto")
 	class UnidadRegistrarGasto{

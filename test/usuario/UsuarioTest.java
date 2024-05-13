@@ -1052,4 +1052,90 @@ class UsuarioTest {
 	}
 	
 	
+	
+	@Nested 
+	@DisplayName("Prueba de aceptación del sprint 2 (se testean desde el reparto de los pagos a la realización de estos)")
+	class realizarPago_repartirgastos{
+		
+		
+		IUsuario paco;
+		IUsuario maria;
+		IUsuario felipe;
+		IGrupo grupofinal;
+		ArrayList<IUsuario> listausers;
+		
+		@Test
+		@DisplayName("Realizar pago caso válido")
+		void testAceptacion() {
+			
+			//generacion de los usuarios
+			IUsuario eva=new Usuario(1, "evauser", "eva", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario luis=new Usuario(2, "luisuser", "luis", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario marta=new Usuario(3, "martauser", "marta", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario juan=new Usuario(4, "juanuser", "juan", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			
+			//se crea la lista a introducir en el grupo
+			ArrayList<IUsuario> lista=new ArrayList<IUsuario>();
+			lista.add(eva);
+			lista.add(luis);
+			lista.add(marta);
+			lista.add(juan);
+			IGrupo loscuatro= eva.crearGrupo(99, "LosCuatro", "grupo", lista);
+			
+			//se imputan los gastos al grupo
+			eva.anadirGasto(loscuatro, 11.30);
+			eva.anadirGasto(loscuatro, 23.15);
+			eva.anadirGasto(loscuatro, 2.05);
+			luis.anadirGasto(loscuatro, 12.0);
+			luis.anadirGasto(loscuatro, 17.49);
+			marta.anadirGasto(loscuatro, 20.22);
+			juan.anadirGasto(loscuatro, 5.75);
+			
+			//se dividen los gastos del grupo
+			eva.dividirGastos(loscuatro);
+			
+			System.out.println("Pre-Pagar");
+			for(String elm : eva.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : luis.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : juan.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : marta.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			
+		
+			for(IPago elm : eva.getPagos()) {
+				eva.realizarPago(elm);
+			}
+			
+			
+			System.out.println("Post-Pagar");
+
+			for(String elm : eva.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : luis.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : juan.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : marta.getNotificaciones()) {
+				System.out.println(elm);
+			}
+		
+	}
+	
+	
+	}
+	
+	
+	
+	
+	
 }

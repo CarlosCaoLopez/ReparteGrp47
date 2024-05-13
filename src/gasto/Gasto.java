@@ -51,9 +51,12 @@ public class Gasto implements IGasto {
 	public IGasto registrarGasto(IGrupo grupo) {
 		if(grupo != null) {
 			grupo.anadirGasto(this);
+			return this;
+		}else {
+			return null;
 		}
 		
-		return this;
+		
 	}
 	
 	@Override
