@@ -587,7 +587,7 @@ class UsuarioTest {
 		@Test
 		@DisplayName("Verificación de que el grupo es no nulo")
 		void testUsuariosNulos() {
-			assertFalse(usuario3.anadirGasto(null, 10.0), "Usuario no forma parte del grupo");
+			assertFalse(usuario3.anadirGasto(null, 10.0), "El grupo es nulo");
 		}
 		
 		@Test
@@ -625,6 +625,80 @@ class UsuarioTest {
 		void testImporteValido(double importe) {
 			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(usuario3)));
 			assertTrue(usuario3.anadirGasto(grupoMock, importe), "Gasto con importe positivo invalidado");
+		}
+		
+	}
+	
+	
+	@Nested 
+	@DisplayName("Pruebas de integración de añadir un gasto desde un Usuario")
+	class anadirGastoIntegracion{
+		
+		IGrupo grupo;
+		IGasto gasto;
+		Usuario usuario3;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario3 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el grupo es no nulo")
+		void testUsuariosNulos() {
+			assertFalse(usuario3.anadirGasto(null, 10.0), "El grupo es nulo");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el grupo no tiene un conjunto de usuarios nulo")
+		void testUsuariosNull() {
+			//Creamos incorrectamente el grupo para poder poner el conjunto de usuario nulo
+			grupo = new Grupo(0, null, null, null);
+			assertFalse(usuario3.anadirGasto(grupo, 10.0), "El conjunto de usuarios es nulo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el grupo debe incluir algún usuario")
+		void testUsuariosVacio() {
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario3)));
+			grupo.getUsuarios().clear();
+			assertFalse(usuario3.anadirGasto(grupo, 10.0), "Usuario no forma parte del grupo");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el usuario se encuentra en [usuarios] del grupo (caso no válido)")
+		void testUsuarioFuera() {
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario3)));
+			IUsuario usuario4 = new Usuario(4, "nomeUsuario", "nomeReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			assertFalse(usuario4.anadirGasto(grupo, 10.0), "Usuario no forma parte del grupo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el usuario se encuentra en [usuarios] del grupo (caso válido)")
+		void testUsuarioDentro() {
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario3)));
+			assertTrue(usuario3.anadirGasto(grupo, 10.0), "Usuario dentro del grupo invalidado");
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el importe del gasto es positivo (caso no válido)")
+		@CsvSource({"-10", "0"})
+		void testImporteNoValido(double importe) {
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario3)));
+			assertFalse(usuario3.anadirGasto(grupo, importe), "Gasto con importe cero o negativo");
+		}
+		
+		@ParameterizedTest
+		@DisplayName("Verificación de que el importe del gasto es positivo (caso válido)")
+		@CsvSource({"0.01", "10"})
+		void testImporteValido(double importe) {
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario3)));
+			assertTrue(usuario3.anadirGasto(grupo, importe), "Gasto con importe positivo invalidado");
 		}
 		
 	}
@@ -696,6 +770,73 @@ class UsuarioTest {
 			when(grupoMock.getUsuarios()).thenReturn(new ArrayList<IUsuario>(Arrays.asList(usuario3)));
 			when(grupoMock.getGastos()).thenReturn(new ArrayList<IGasto>(Arrays.asList(gastoMock)));
 			assertTrue(usuario3.dividirGastos(grupoMock), "El grupo es en realidad correcto");
+		}
+		
+	}
+	
+	@Nested 
+	@DisplayName("Pruebas integración de dividir gastos desde un Usuario")
+	class dividirGastosIntegración{
+		
+		IGrupo grupo;
+		IGasto gasto;
+		Usuario usuario3;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			usuario3 = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el grupo es no nulo")
+		void testGrupoNulo() {
+			assertFalse(usuario3.dividirGastos(null), "El grupo es nulo");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el conjunto de usuarios del grupo es no nulo")
+		void testUsuariosNulo() {
+			grupo = new Grupo(0, null, null, null);
+			grupo.setGastos(new ArrayList<IGasto>(Arrays.asList(gasto)));
+			assertFalse(usuario3.dividirGastos(grupo), "El conjunto de usuarios del grupo es nulo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el grupo debe incluir algún usuario")
+		void testUsuariosVacio() {
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario3)));
+			grupo.getUsuarios().clear();
+			assertFalse(usuario3.dividirGastos(grupo), "El grupo no tiene integrantes");
+		}
+		
+		@Test
+		@DisplayName("Verificación de que el conjunto de gastos del grupo es no nulo")
+		void testGastosNulo() {
+			grupo = new Grupo(0, null, null, null);
+			grupo.setUsuarios(new ArrayList<>(Arrays.asList(usuario3)));
+			assertFalse(usuario3.dividirGastos(grupo), "El conjunto de gastos del grupo es nulo");
+		}	
+		
+		@Test
+		@DisplayName("Verificación de que el grupo debe incluir algún gasto")
+		void testGastosVacio() {
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario3)));
+			grupo.getGastos().clear();
+			assertFalse(usuario3.dividirGastos(grupo), "El conjunto de gastos está vacío");
+		}
+		
+		@Test
+		@DisplayName("Verificación del pago caso válido")
+		void testValido() {
+			grupo = new Grupo(1, "nombre", "descripcion", new ArrayList<IUsuario>(Arrays.asList(usuario3)));
+			gasto = new Gasto(1, 5.0, grupo, usuario3);
+			grupo.getGastos().add(gasto);
+			assertTrue(usuario3.dividirGastos(grupo), "El grupo es en realidad correcto");
 		}
 		
 	}

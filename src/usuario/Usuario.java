@@ -196,7 +196,7 @@ public class Usuario implements IUsuario {
 	@Override
 	public boolean anadirGasto(IGrupo grupo, double cantidad) {
 		
-		if(grupo!=null && grupo.getUsuarios().contains(this) && cantidad>0) {
+		if(grupo!=null && grupo.getUsuarios()!=null && grupo.getUsuarios().contains(this) && cantidad>0) {
 			IGasto gasto = new Gasto(this.id+this.gastos.size(), cantidad, grupo, this);
 			this.gastos.add(gasto);
 			grupo.anadirGasto(gasto);
