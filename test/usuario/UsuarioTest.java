@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -477,7 +478,131 @@ class UsuarioTest {
 		}
 	}
 	
+	@Nested
+	@DisplayName("Pruebas de incorporación y eliminación de miembros en Grupo desde Usuario")
+	class incorporar_eliminarEnGrupoUnidad{
+		AutoCloseable acl;
+		IGrupo grupoMock;
+		Usuario usuario, usuario1;
+		ArrayList<IUsuario> Lideres;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			grupoMock = mock(IGrupo.class);
+			acl = MockitoAnnotations.openMocks(this);
+			
+			usuario = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuario1 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			
+			Lideres = new ArrayList<IUsuario>();
+			Lideres.add(usuario);
+			when(grupoMock.anadirMiembro(any(IUsuario.class))).thenReturn(true);
+			when(grupoMock.eliminarMiembro(any(IUsuario.class))).thenReturn(true);
+			when(grupoMock.getLideres()).thenReturn(Lideres);
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			acl.close();
+		}
+		
+		/**
+		 * TESTS DE INCORPORAR
+		 */
+		
+		@Test
+		@DisplayName("[Incorporar] Verificación de que el usuario a incorporar es correcto")
+		void testIUsuarioNoNulo() {
+			
+			assertAll( 	()-> {assertFalse(usuario.incorporarMiembroEnGrupo(null, grupoMock), "Usuario nulo introducido tratado como válido");},
+						()-> {assertTrue(usuario.incorporarMiembroEnGrupo(usuario1, grupoMock), "Usuario correcto introducido tratado como inválido");}
+					);
+		}
+		
+		 @Test
+		 @DisplayName("[Incorporar] Verificación grupo nulo o no nulo")
+		 void testIGrupoNulo() {
+			 assertAll(	()->{assertFalse(usuario.incorporarMiembroEnGrupo(usuario1, null), "Grupo nulo tratado como válido");},
+					 	()->{assertTrue(usuario.incorporarMiembroEnGrupo(usuario1, grupoMock), "Grupo no nulo tratado como inválido");}
+					 	);
+		 }
+		
+		 @Test
+		 @DisplayName("[Incorporar] Verificación grupo sin llamador en lideres")
+		 void testIGrupoSinLlamadorEnLideres() {
+			 Lideres.remove(usuario);
+			 assertFalse(usuario.incorporarMiembroEnGrupo(usuario1, grupoMock), "Grupo sin llamador en lideres validado");
+		 }
+		 @Test
+		 @DisplayName("[Incorporar] Verificación grupo con llamador en lideres")
+		 void testIGrupoLlamadorEnLideres() {
+			 assertTrue(usuario.incorporarMiembroEnGrupo(usuario1, grupoMock), "Grupo con llamador en lideres invalidado");
+		 }
+		 
+		 
+		 /**
+		  * TESTS DE ELIMINAR
+		  */
+		 
+		@Test
+		@DisplayName("[Eliminar] Verificación de que el usuario a eliminar es correcto")
+		void testEUsuarioNoNulo() {
+			
+			assertAll( 	()-> {assertFalse(usuario.eliminarMiembroEnGrupo(null, grupoMock), "Usuario nulo introducido tratado como válido");},
+						()-> {assertTrue(usuario.eliminarMiembroEnGrupo(usuario1, grupoMock), "Usuario correcto introducido tratado como inválido");}
+					);
+		}
+		 @Test
+		 @DisplayName("[Eliminar] Verificación grupo nulo o no nulo")
+		 void testEGrupoNulo() {
+			 assertAll(	()->{assertFalse(usuario.eliminarMiembroEnGrupo(usuario1, null), "Grupo nulo tratado como válido");},
+					 	()->{assertTrue(usuario.eliminarMiembroEnGrupo(usuario1, grupoMock), "Grupo no nulo tratado como inválido");}
+					 	);
+		 }
+		 
+		 @Test
+		 @DisplayName("[Eliminar] Verificación grupo sin llamador en lideres")
+		 void testEGrupoSinLlamadorEnLideres() {
+			 Lideres.remove(usuario);
+			 assertFalse(usuario.eliminarMiembroEnGrupo(usuario1, grupoMock), "Grupo sin llamador en lideres validado");
+		 }
+		 
+		 @Test
+		 @DisplayName("[Eliminar] Verificación grupo con llamador en lideres")
+		 void testEGrupoLlamadorEnLideres() {
+			 assertTrue(usuario.eliminarMiembroEnGrupo(usuario1, grupoMock), "Grupo con llamador en lideres invalidado");
+		 }
+	}
 	
+	@Nested 
+	@DisplayName("Pruebas del método de Usuario.eliminarGrupo()")
+	class eliminarGrupoIntegracion{ //Las pruebas de integración grupo deben ser de integración
+									// ya que dependen del método dividirGastos() que a su vez
+									// depende de otros métodos de grupo (lo cual complica el uso de mocks)
+		AutoCloseable acl;
+		IGrupo grupoMock;
+		Usuario usuario, usuario1;
+		ArrayList<IUsuario> Lideres;
+		
+		@BeforeEach
+		void setUp() throws Exception {
+			grupoMock = mock(IGrupo.class);
+			acl = MockitoAnnotations.openMocks(this);
+			
+			usuario = new Usuario(1, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			usuario1 = new Usuario(2, "nombreUsuario", "nombreReal", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			
+			Lideres = new ArrayList<IUsuario>();
+			Lideres.add(usuario);
+			when(grupoMock.getLideres()).thenReturn(Lideres);
+		}
+
+		@AfterEach
+		void tearDown() throws Exception {
+			acl.close();
+		}
+	}
+
 	@Nested 
 	@DisplayName("Pruebas de gestión de grupo desde un Usuario")
 	class gestionarGrupo{
@@ -1191,6 +1316,92 @@ class UsuarioTest {
 		}
 		
 	}
+	
+	
+	
+	@Nested 
+	@DisplayName("Prueba de aceptación del sprint 2 (se testean desde el reparto de los pagos a la realización de estos)")
+	class realizarPago_repartirgastos{
+		
+		
+		IUsuario paco;
+		IUsuario maria;
+		IUsuario felipe;
+		IGrupo grupofinal;
+		ArrayList<IUsuario> listausers;
+		
+		@Test
+		@DisplayName("Realizar pago caso válido")
+		void testAceptacion() {
+			
+			//generacion de los usuarios
+			IUsuario eva=new Usuario(1, "evauser", "eva", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario luis=new Usuario(2, "luisuser", "luis", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario marta=new Usuario(3, "martauser", "marta", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			IUsuario juan=new Usuario(4, "juanuser", "juan", "nombre@dominio.com", LocalDate.of(2000, Month.JANUARY, 1), "Nombr€", "ES0000000000000000000000");
+			
+			//se crea la lista a introducir en el grupo
+			ArrayList<IUsuario> lista=new ArrayList<IUsuario>();
+			lista.add(eva);
+			lista.add(luis);
+			lista.add(marta);
+			lista.add(juan);
+			IGrupo loscuatro= eva.crearGrupo(99, "LosCuatro", "grupo", lista);
+			
+			//se imputan los gastos al grupo
+			eva.anadirGasto(loscuatro, 11.30);
+			eva.anadirGasto(loscuatro, 23.15);
+			eva.anadirGasto(loscuatro, 2.05);
+			luis.anadirGasto(loscuatro, 12.0);
+			luis.anadirGasto(loscuatro, 17.49);
+			marta.anadirGasto(loscuatro, 20.22);
+			juan.anadirGasto(loscuatro, 5.75);
+			
+			//se dividen los gastos del grupo
+			eva.dividirGastos(loscuatro);
+			
+			System.out.println("Pre-Pagar");
+			for(String elm : eva.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : luis.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : juan.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : marta.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			
+		
+			for(IPago elm : eva.getPagos()) {
+				eva.realizarPago(elm);
+			}
+			
+			
+			System.out.println("Post-Pagar");
+
+			for(String elm : eva.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : luis.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : juan.getNotificaciones()) {
+				System.out.println(elm);
+			}
+			for(String elm : marta.getNotificaciones()) {
+				System.out.println(elm);
+			}
+		
+	}
+	
+	
+	}
+	
+	
+	
 	
 	
 }
